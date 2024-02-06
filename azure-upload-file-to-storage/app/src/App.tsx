@@ -1,7 +1,8 @@
 import { BlockBlobClient } from '@azure/storage-blob';
 import { Box, Card, Button, CardMedia, Grid, Typography } from '@mui/material';
-// import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { ChangeEvent, useState } from 'react';
+//import { styled } from '@mui/material/styles';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
 import NavBar from './components/navbar';
 import { convertFileToArrayBuffer } from './lib/convert-file-to-arraybuffer';
@@ -33,20 +34,23 @@ function App() {
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [list, setList] = useState<string[]>([]);
 
-  const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
-    const { target } = event;
-  
-    if (!(target instanceof HTMLInputElement)) return;
-    if (!target.files || target.files.length === 0) return;
-  
-    // Convert FileList to array and update state
-    const filesArray = Array.from(target.files);
-    setSelectedFiles(filesArray);
-  
-    // Reset other states
-    setSasTokenUrl('');
-    setUploadStatus('');
+  const handleFilesAccepted = (files : File[]) => {
+    setSelectedFiles(files);
   };
+  // const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
+  //   const { target } = event;
+    
+  //   if (!(target instanceof HTMLInputElement)) return;
+  //   if (!target.files || target.files.length === 0) return;
+  
+  //   // Convert FileList to array and update state
+  //   const filesArray = Array.from(target.files);
+  //   setSelectedFiles(filesArray);
+  //   console.log(selectedFiles);
+  //   // Reset other states
+  //   setSasTokenUrl('');
+  //   setUploadStatus('');
+  // };
 
   const handleFileSasToken = () => {
     const permission = 'w'; //write
@@ -196,10 +200,9 @@ function App() {
               </div>
               <div className='filler'></div>
               <div className='upload-button-div'>
-                <Button component="label" color='secondary' variant="contained"  onClick={handleFileUpload}>
+                <Button component="label" variant="contained" startIcon={<CloudUploadIcon />} onClick={handleFileUpload}>
                   Upload
                 </Button>
-                <a type="button" className="btn btn-purple"><i className="fas fa-heart pr-2" aria-hidden="false"></i>Heart</a>
               </div>
           </div>
           {/* App Title */}
@@ -223,7 +226,7 @@ function App() {
           >
             <Button variant="contained" component="label">
              Select Files
-            <input type="file" hidden multiple onChange={handleFileSelection} />
+            <input type="file" hidden multiple onChange={handleFileUpload} />
             </Button>
             {selectedFiles.length > 0 && (
               <Box my={2}>
