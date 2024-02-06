@@ -1,43 +1,60 @@
-import {useDropzone} from 'react-dropzone';
 import './dragAndDrop.css';
-import ControlPointRoundedIcon from '@mui/icons-material/ControlPointRounded';
+import React from 'react';
 
-interface AcceptProps {
-  onFilesAccepted: (files: File[]) => void;
-}
-
-const Accept: React.FC<AcceptProps> = ({ onFilesAccepted }) => {
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    accept: {
-      'image/jpeg': [],
-      'image/png': [],
-    },
-    onDrop: (files) => {
-      onFilesAccepted(files); // Call the callback with accepted files
-    },
-  });
-  
-
-  const filesSelectedText =
-    acceptedFiles.length > 0 ? (
-      <p className="drag-drop-text">{acceptedFiles.length} file(s) have been selected</p>
-    ) : (
-      <p className="drag-drop-text">
-        <ControlPointRoundedIcon color="disabled" fontSize="large"/>
-        Drag & Drop or click to choose .dat files
-      </p>
-    );
-
-  return (
-    <section className="container">
-      <div {...getRootProps({ className: 'dropzone' })}>
-        <input {...getInputProps()} />
-        {filesSelectedText}
+// drag drop file component
+function DragDropFile() {
+    // drag state
+    const [dragActive, setDragActive] = React.useState(false);
+    // ref
+    const inputRef = React.useRef(null);
+    
+    // handle drag events
+    const handleDrag = function(e: React.DragEvent<HTMLFormElement>) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.type === "dragenter" || e.type === "dragover") {
+        setDragActive(true);
+      } else if (e.type === "dragleave") {
+        setDragActive(false);
+      }
+    };
+    
+   // triggers when file is dropped
+    const handleDrop = function(e: React.DragEvent<HTMLFormElement>) {
+      e.preventDefault();
+      e.stopPropagation();
+      setDragActive(false);
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        // handleFiles(e.dataTransfer.files);
+      }
+    };
+    
+    // triggers when file is selected with click
+    const handleChange = function(e: React.ChangeEvent<HTMLInputElement>) {
+      e.preventDefault();
+      if (e.target.files && e.target.files[0]) {
+        // handleFiles(e.target.files);
+      }
+    };
+    
+  // triggers the input when the button is clicked
+    const onButtonClick = () => {
+        console.log("Uploading...")
+    };
+    
+    return (
+      <div className='main-container'>
+        <form id="form-file-upload" onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()} onDrop={handleDrop}>
+          <input ref={inputRef} type="file" id="input-file-upload" multiple={true} onChange={handleChange} />
+          <label id="label-file-upload" htmlFor="input-file-upload" className={dragActive ? "drag-active" : "" }>
+            <div>
+              <p>Drag and drop your file here or</p>
+              <button className="upload-button" onClick={onButtonClick}>Upload a file</button>
+            </div> 
+          </label>
+        </form>
       </div>
-      
-    </section>
-  );
-};
+    );
+  }
 
-
-export default Accept
+export default DragDropFile
