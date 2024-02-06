@@ -32,7 +32,10 @@ function App() {
   const [sasTokenUrl, setSasTokenUrl] = useState<string>('');
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [list, setList] = useState<string[]>([]);
-
+  
+  const handleFilesAccepted = (files : File[]) => {
+    setSelectedFiles(files);
+  };
   const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
     const { target } = event;
   
@@ -151,7 +154,7 @@ function App() {
           <div className='backgroundDragDrop'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap"/>
             <h1 className='h1'>Upload files</h1>
-            <DragDropFile></DragDropFile>
+            <DragDropFile onFilesAccepted={handleFilesAccepted}></DragDropFile>
             <h2>Export options</h2>
               <div className='filler'></div>
               <div className='checkboxes-left'>
