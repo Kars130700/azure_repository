@@ -1,6 +1,6 @@
 import { BlockBlobClient } from '@azure/storage-blob';
 import { Box, Card, Button, CardMedia, Grid, Typography } from '@mui/material';
-// import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ChangeEvent, useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
 import NavBar from './components/navbar';
@@ -199,7 +199,7 @@ function App() {
               </div>
               <div className='filler'></div>
               <div className='upload-button-div'>
-                <Button component="label" color='secondary' variant="contained"  onClick={handleFileUpload}>
+                <Button component="label" color='secondary' variant="contained" startIcon={<CloudUploadIcon />} onClick={handleFileUpload}>
                   Upload
                 </Button>
                 <a type="button" className="btn btn-purple"><i className="fas fa-heart pr-2" aria-hidden="false"></i>Heart</a>
