@@ -3,7 +3,6 @@ import { Box, Button, Card, CardMedia, Grid, Typography } from '@mui/material';
 import { ChangeEvent, useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
 import { convertFileToArrayBuffer } from './lib/convert-file-to-arraybuffer';
-
 import axios, { AxiosResponse } from 'axios';
 import './App.css';
 
