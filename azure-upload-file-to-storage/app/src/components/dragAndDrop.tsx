@@ -1,6 +1,6 @@
 import {useDropzone} from 'react-dropzone';
 import './dragAndDrop.css';
-//import ControlPointRoundedIcon from '@mui/icons-material/ControlPointRounded';
+import ControlPointRoundedIcon from '@mui/icons-material/ControlPointRounded';
 
 interface AcceptProps {
   onFilesAccepted: (files: File[]) => void;
@@ -23,7 +23,7 @@ const Accept: React.FC<AcceptProps> = ({ onFilesAccepted }) => {
       <p className="drag-drop-text">{acceptedFiles.length} file(s) have been selected</p>
     ) : (
       <p className="drag-drop-text">
-        {/* <ControlPointRoundedIcon color="disabled" fontSize="large"/> */}
+        <ControlPointRoundedIcon color="disabled" fontSize="large"/>
         Drag & Drop or click to choose .dat files
       </p>
     );
