@@ -16,9 +16,5 @@
   "workspaces": [
     "lib-openai/",
     "cli-openai/"
-  ],
-  "dependencies": {
-    "@mui/icons-material": "^5.15.7",
-    "react-dropzone": "^14.2.3"
-  }
+  ]
 }
