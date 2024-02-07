@@ -161,19 +161,19 @@ function App() {
                 <div className='box-label'>
                 <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Default checkbox
+                  Create aggregated file
                 </label>
                 </div>
                 <div className='box-label'>
                 <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Cooking time per year
+                  Display usage per year
                 </label>
                 </div>
                 <div className='box-label'>
                 <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Default checkbox
+                  Display usage per month
                 </label>
                 </div>
               </div>
@@ -181,19 +181,19 @@ function App() {
                 <div className='box-label'>
                 <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Default checkbox
+                  Display usage per day
                 </label>
                 </div>
                 <div className='box-label'>
                 <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" />
                 <label className="form-check-label" htmlFor="flexRadioDefault1">
-                  Default radio
+                  Create PDF file
                 </label>
                 </div>  
                 <div className='box-label'> 
                 <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"/>
                 <label className="form-check-label" htmlFor="flexRadioDefault2">
-                  Default radio
+                  Create excel file
                 </label>
                 </div>  
               </div>
@@ -202,7 +202,6 @@ function App() {
                 <Button component="label" color='secondary' variant="contained" startIcon={<CloudUploadIcon />} onClick={handleFileUpload}>
                   Upload
                 </Button>
-                <a type="button" className="btn btn-purple"><i className="fas fa-heart pr-2" aria-hidden="false"></i>Heart</a>
               </div>
           </div>
           {/* App Title */}

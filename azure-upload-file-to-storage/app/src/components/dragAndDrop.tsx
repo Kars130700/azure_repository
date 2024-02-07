@@ -11,13 +11,14 @@ const Accept: React.FC<AcceptProps> = ({ onFilesAccepted }) => {
     accept: {
       'image/jpeg': [],
       'image/png': [],
+      'text/plain': [],  // Allow .txt files
+      'application/octet-stream': [],  // Allow .dat files (application/octet-stream is a generic binary type)
     },
     onDrop: (files) => {
       onFilesAccepted(files); // Call the callback with accepted files
     },
   });
   
-
   const filesSelectedText =
     acceptedFiles.length > 0 ? (
       <p className="drag-drop-text">{acceptedFiles.length} file(s) have been selected</p>
@@ -38,6 +39,5 @@ const Accept: React.FC<AcceptProps> = ({ onFilesAccepted }) => {
     </section>
   );
 };
-
 
 export default Accept
