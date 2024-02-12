@@ -86,7 +86,21 @@ function App() {
 
   const handleFileUpload = () => {
     if (selectedFiles.length === 0) return;
-  
+    
+    // Converts bool to string, can be more efficient
+    const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
+    // Trigger the ButtonState function
+    request
+    .post(`/api/ButtonState?name=John&aggregatedChecked=${aggregatedCheckedValue}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .catch((error: unknown) => {
+      // Handle errors
+      console.error(error);
+    });
+
     Promise.all(
       selectedFiles.map((file) => {
         // Fetch SAS token htmlFor the current file

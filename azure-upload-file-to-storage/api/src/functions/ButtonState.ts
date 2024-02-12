@@ -3,9 +3,14 @@ import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/fu
 export async function ButtonState(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     context.log(`Http function processed request for url "${request.url}"`);
 
-    const name = request.query.get('name') || await request.text() || 'world';
+    const aggregatedCheckedValue = request.query.get('aggregatedChecked') || 'false';
 
-    return { body: `Hello, ${name}!` };
+    context.log(`Aggregated Checked Value: ${aggregatedCheckedValue}`);
+    // Log the value to the console
+    console.log(`Aggregated Checked Value: ${aggregatedCheckedValue}`);
+
+    // Return the value in the HTTP response
+    return { body: `Aggregated Checked Value: ${aggregatedCheckedValue}` };
 };
 
 app.http('ButtonState', {
