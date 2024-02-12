@@ -5,7 +5,6 @@ import {
   app
 } from '@azure/functions';
 import { listFilesInContainer } from '../lib/azure-storage.js';
-import { exec } from 'child_process';
 
 export async function getFilesInContainer(
   request: HttpRequest,
@@ -13,17 +12,6 @@ export async function getFilesInContainer(
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
 
-  const pythonScriptPath = '/src/TestScript.py';
-  const command = `python ${pythonScriptPath}`;
-
-  exec(command, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error executing Python script: ${error.message}`);
-      return;
-    }
-
-    console.log('Python script output:', stdout);
-  });
   try {
     if (
       !process.env?.Azure_Storage_AccountName ||
