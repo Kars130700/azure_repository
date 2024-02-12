@@ -91,16 +91,14 @@ function App() {
     const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
     // Trigger the ButtonState function
     request
-      .post(`/api/ButtonState?name=John&aggregatedChecked=${aggregatedCheckedValue}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      .post(`/api/ButtonState`, {
+        aggregatedChecked: aggregatedCheckedValue,
       })
       .catch((error: unknown) => {
         // Handle errors
         console.error(error);
       });
-      console.log(aggregatedCheckedValue);  
+    console.log(aggregatedCheckedValue);
     Promise.all(
       selectedFiles.map((file) => {
         // Fetch SAS token htmlFor the current file

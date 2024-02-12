@@ -3,7 +3,7 @@ import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/fu
 export async function ButtonState(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     context.log(`Http function processed request for url "${request.url}"`);
 
-    const aggregatedCheckedValue = request.query.get('aggregatedChecked') || 'false';
+    const aggregatedCheckedValue = request.body.aggregatedChecked || 'false';
 
     context.log(`Aggregated Checked Value: ${aggregatedCheckedValue}`);
     // Log the value to the console
@@ -14,7 +14,7 @@ export async function ButtonState(request: HttpRequest, context: InvocationConte
 };
 
 app.http('ButtonState', {
-    methods: ['GET', 'POST'],
+    methods: ['POST'],
     authLevel: 'anonymous',
     handler: ButtonState
 });
