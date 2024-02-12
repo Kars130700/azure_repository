@@ -32,6 +32,7 @@ function App() {
   const [sasTokenUrl, setSasTokenUrl] = useState<string>('');
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [list, setList] = useState<string[]>([]);
+  const [AggregatedChecked, SetAggregatedChecked] = useState<boolean>(false);
   
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
@@ -159,19 +160,19 @@ function App() {
               <div className='filler'></div>
               <div className='checkboxes-left'>
                 <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault1" onChange={() => SetAggregatedChecked(!AggregatedChecked)} / >
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Create aggregated file
                 </label>
                 </div>
                 <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault2"/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Display usage per year
                 </label>
                 </div>
                 <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault3"/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Display usage per month
                 </label>
@@ -179,7 +180,7 @@ function App() {
               </div>
               <div className='checkboxes-right'>
                 <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault4"/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Display usage per day
                 </label>
