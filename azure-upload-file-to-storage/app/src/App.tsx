@@ -93,7 +93,9 @@ function App() {
     // Trigger the ButtonState function
     request
       .post(`/api/ButtonState?aggregatedChecked=${aggregatedCheckedValue}`, {
-        aggregatedChecked: aggregatedCheckedValue,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
       .catch((error: unknown) => {
         // Handle errors

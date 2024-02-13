@@ -20,7 +20,7 @@ export async function ButtonState(
   console.log(`Aggregated Checked Value: ${aggregatedCheckedValue}`);
 
   // Return the value in the HTTP response
-  return { body: `Aggregated Checked Value: ${aggregatedCheckedValue}` };
+  return { body: aggregatedCheckedValue };
 }
 
 //configures the azure functions to handle HTTP request under route ButtonState
