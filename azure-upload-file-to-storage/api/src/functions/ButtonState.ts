@@ -19,21 +19,15 @@ export async function ButtonState(
   const PDFChecked = request.query.get('PDFChecked');
   const ExcelChecked = request.query.get('ExcelChecked');
 
-  const checkboxNames = [
-    aggregatedChecked,
-    yearlyChecked,
-    monthlyChecked,
-    dailyChecked,
-    PDFChecked,
-    ExcelChecked
-  ];
+  const aggregatedCheckedValue = aggregatedChecked === 'true' ? '1' : '0';
+  const yearlyCheckedValue = yearlyChecked === 'true' ? '1' : '0';
+  const monthlyCheckedValue = monthlyChecked === 'true' ? '1' : '0';
+  const dailyCheckedValue = dailyChecked === 'true' ? '1' : '0';
+  const PDFCheckedValue = PDFChecked === 'true' ? '1' : '0';
+  const ExcelCheckedValue = ExcelChecked === 'true' ? '1' : '0';
 
-  // Use Array.map to convert each checkbox value to '1' if true, '0' if false
-  const resultBinaryString = checkboxNames
-    .map((checkboxName) =>
-      request.query.get(checkboxName) === 'true' ? '1' : '0'
-    )
-    .join('');
+  // Concatenate the values to form the final string
+  const resultBinaryString = `${aggregatedCheckedValue}${yearlyCheckedValue}${monthlyCheckedValue}${dailyCheckedValue}${PDFCheckedValue}${ExcelCheckedValue}`;
 
   return { body: `${resultBinaryString} en ${aggregatedChecked}` };
 }
