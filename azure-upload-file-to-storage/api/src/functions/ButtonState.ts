@@ -29,7 +29,7 @@ export async function ButtonState(
   // Concatenate the values to form the final string
   const resultBinaryString = `${aggregatedCheckedValue}${yearlyCheckedValue}${monthlyCheckedValue}${dailyCheckedValue}${PDFCheckedValue}${ExcelCheckedValue}`;
 
-  return { body: `${resultBinaryString} en ${aggregatedChecked}` };
+  return { body: `${resultBinaryString}` };
 }
 
 app.http('ButtonState', {
