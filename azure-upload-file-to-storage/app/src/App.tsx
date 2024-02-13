@@ -97,7 +97,7 @@ function App() {
     console.log(aggregatedCheckedValue);
     // Trigger the ButtonState function
     request
-      .post(`/api/ButtonState?&aggregatedChecked=${AggregatedChecked}&yearlyChecked=${YearlyChecked}&monthlyChecked=${MonthlyChecked}}`, {
+      .post(`/api/ButtonState?&aggregatedChecked=${AggregatedChecked}&yearlyChecked=${YearlyChecked}&monthlyChecked=${MonthlyChecked}&dailyChecked=${DailyChecked}&PDFChecked=${PDFChecked}&ExcelChecked=${ExcelChecked}}`, {
         headers: {
           'Content-Type': 'application/json',
         },
