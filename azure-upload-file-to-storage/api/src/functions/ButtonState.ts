@@ -4,49 +4,29 @@ import {
   HttpResponseInit,
   InvocationContext
 } from '@azure/functions';
-import * as http from 'http';
+
+let aggregatedChecked = false;
 
 export async function ButtonState(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
-  if (request.method == 'POST') {
-    const aggregatedCheckedValue =
-      request.query.get('aggregatedChecked') || 'false';
-    const postUrl =
-      'https://thankful-sky-09024e01e.4.azurestaticapps.net/api/ButtonState';
-    // Create the HTTP request options
-    const options: http.RequestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    };
+  context.log(`Http function processed request for url "${request.url}"`);
 
-    // Create a request object
-    const httpRequest = http.request(postUrl, options, (response) => {
-      // Handle the response from the server
-      if (response.statusCode === 200) {
-        // Respond with a success message
-        context.log('Button state posted successfully');
-      } else {
-        // Respond with an error message
-        context.error;
-      }
-    });
+  // Get the name parameter from the query string
+  const name = request.query.get('name') || 'world';
 
-    // Write the data to the request body
-    httpRequest.write(JSON.stringify({ aggregatedCheckedValue }));
-
-    // End the request
-    httpRequest.end();
-    return { body: aggregatedCheckedValue };
+  // Get the aggregatedChecked parameter from the query string
+  const aggregatedCheckedParam = request.query.get('aggregatedChecked');
+  if (aggregatedCheckedParam) {
+    aggregatedChecked = aggregatedCheckedParam.toLowerCase() === 'true';
   }
+
+  return { body: `Hello, ${name}! AggregatedChecked: ${aggregatedChecked}` };
 }
 
-//configures the azure functions to handle HTTP request under route ButtonState
 app.http('ButtonState', {
-  methods: ['POST', 'GET'],
+  methods: ['GET', 'POST'],
   authLevel: 'anonymous',
   handler: ButtonState
 });
