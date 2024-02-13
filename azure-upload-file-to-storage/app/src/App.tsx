@@ -32,12 +32,12 @@ function App() {
   const [sasTokenUrl, setSasTokenUrl] = useState<string>('');
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [list, setList] = useState<string[]>([]);
-  const [AggregatedChecked, SetAggregatedChecked] = useState<boolean>(false);
-  const [YearlyChecked, SetYearlyChecked] = useState<boolean>(false);
-  const [MonthlyChecked, SetMonthlyChecked] = useState<boolean>(false);
-  const [DailyChecked, SetDailyChecked] = useState<boolean>(false);
-  const [PDFChecked, SetPDFChecked] = useState<boolean>(false);
-  const [ExcelChecked, SetExcelChecked] = useState<boolean>(false);
+  const [AggregatedChecked, SetAggregatedChecked] = useState<string>('false');
+  const [YearlyChecked, SetYearlyChecked] = useState<string>('false');
+  const [MonthlyChecked, SetMonthlyChecked] = useState<string>('false');
+  const [DailyChecked, SetDailyChecked] = useState<string>('false');
+  const [PDFChecked, SetPDFChecked] = useState<string>('false');
+  const [ExcelChecked, SetExcelChecked] = useState<string>('false');
 
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
@@ -97,14 +97,7 @@ function App() {
     console.log(aggregatedCheckedValue);
     // Trigger the ButtonState function
     request
-      .post(`/api/ButtonState`, {
-        aggregatedChecked: AggregatedChecked,
-        yearlyChecked: YearlyChecked,
-        monthlyChecked: MonthlyChecked,
-        dailyChecked: DailyChecked,
-        PDFChecked: PDFChecked,
-        ExcelChecked: ExcelChecked,
-      }, {
+      .post(`/api/ButtonState?&aggregatedChecked=${AggregatedChecked}&yearlyChecked=${YearlyChecked}&monthlyChecked=${MonthlyChecked}}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -187,19 +180,19 @@ function App() {
               <div className='filler'></div>
               <div className='checkboxes-left'>
                 <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault1" onChange={() => SetAggregatedChecked(!AggregatedChecked)} / >
+                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault1" onChange={() => SetAggregatedChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))} / >
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Create aggregated file
                 </label>
                 </div>
                 <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault2" onChange={() => SetYearlyChecked(!YearlyChecked)}/>
+                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault2" onChange={() => SetYearlyChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Display usage per year
                 </label>
                 </div>
                 <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault3" onChange={() => SetMonthlyChecked(!MonthlyChecked)}/>
+                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault3" onChange={() => SetMonthlyChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Display usage per month
                 </label>
@@ -207,19 +200,19 @@ function App() {
               </div>
               <div className='checkboxes-right'>
                 <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault4" onChange={() => SetDailyChecked(!DailyChecked)}/>
+                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault4" onChange={() => SetDailyChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Display usage per day
                 </label>
                 </div>
                 <div className='box-label'>
-                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={() => SetPDFChecked(!PDFChecked)} />
+                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={() => SetPDFChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))} />
                 <label className="form-check-label" htmlFor="flexRadioDefault1">
                   Create PDF file
                 </label>
                 </div>  
                 <div className='box-label'> 
-                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onChange={() => SetExcelChecked(!ExcelChecked)}/>
+                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onChange={() => SetExcelChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
                 <label className="form-check-label" htmlFor="flexRadioDefault2">
                   Create excel file
                 </label>
