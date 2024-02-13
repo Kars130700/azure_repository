@@ -30,7 +30,9 @@ export async function ButtonState(
 
   // Use Array.map to convert each checkbox value to '1' if true, '0' if false
   const resultBinaryString = checkboxNames
-    .map((checkboxName) => (request.query.get(checkboxName) ? '1' : '0'))
+    .map((checkboxName) =>
+      request.query.get(checkboxName) === 'true' ? '1' : '0'
+    )
     .join('');
 
   return { body: `${resultBinaryString}` };
