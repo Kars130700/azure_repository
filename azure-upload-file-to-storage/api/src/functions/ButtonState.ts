@@ -35,7 +35,7 @@ export async function ButtonState(
     )
     .join('');
 
-  return { body: `${resultBinaryString}` };
+  return { body: `${resultBinaryString} en ${aggregatedChecked}` };
 }
 
 app.http('ButtonState', {
