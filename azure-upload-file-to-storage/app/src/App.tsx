@@ -89,16 +89,17 @@ function App() {
     
     // Converts bool to string, can be more efficient
     const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
+    console.log(aggregatedCheckedValue);
     // Trigger the ButtonState function
     request
-      .post(`/api/ButtonState`, {
+      .post(`/api/ButtonState?aggregatedChecked=${aggregatedCheckedValue}`, {
         aggregatedChecked: aggregatedCheckedValue,
       })
       .catch((error: unknown) => {
         // Handle errors
         console.error(error);
       });
-    console.log(aggregatedCheckedValue);
+    
     Promise.all(
       selectedFiles.map((file) => {
         // Fetch SAS token htmlFor the current file
