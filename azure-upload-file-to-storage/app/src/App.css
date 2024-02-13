@@ -69,12 +69,12 @@ h2 {
 
 .filler{
     height: 3rem;
-    flex: 20%;
+    flex: 18%;
     text-align: center;
 }
 .checkboxes-left{
     height: 7rem;
-    flex: 30%;
+    flex: 32%;
     display: flex;
     flex-direction: column;
     text-align: right;
@@ -82,7 +82,7 @@ h2 {
 }
 .checkboxes-right{
     height: 7rem;
-    flex: 30%;
+    flex: 32%;
     display: flex;
     flex-direction: column;
     text-align: left;

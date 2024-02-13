@@ -13,6 +13,7 @@ export async function ButtonState(
 
   // Get the aggregatedChecked parameter from the query string
   const aggregatedChecked = request.query.get('aggregatedChecked');
+  const lifetimeChecked = request.query.get('lifetimeChecked');
   const yearlyChecked = request.query.get('yearlyChecked');
   const monthlyChecked = request.query.get('monthlyChecked');
   const dailyChecked = request.query.get('dailyChecked');
@@ -20,6 +21,7 @@ export async function ButtonState(
   const ExcelChecked = request.query.get('ExcelChecked');
 
   const aggregatedCheckedValue = aggregatedChecked === 'true' ? '1' : '0';
+  const lifetimeCheckedValue = lifetimeChecked === 'true' ? '1' : '0';
   const yearlyCheckedValue = yearlyChecked === 'true' ? '1' : '0';
   const monthlyCheckedValue = monthlyChecked === 'true' ? '1' : '0';
   const dailyCheckedValue = dailyChecked === 'true' ? '1' : '0';
@@ -27,7 +29,7 @@ export async function ButtonState(
   const ExcelCheckedValue = ExcelChecked === 'true' ? '1' : '0';
 
   // Concatenate the values to form the final string
-  const resultBinaryString = `${aggregatedCheckedValue}${yearlyCheckedValue}${monthlyCheckedValue}${dailyCheckedValue}${PDFCheckedValue}${ExcelCheckedValue}`;
+  const resultBinaryString = `${aggregatedCheckedValue}${lifetimeCheckedValue}${yearlyCheckedValue}${monthlyCheckedValue}${dailyCheckedValue}${PDFCheckedValue}${ExcelCheckedValue}`;
 
   return { body: `${resultBinaryString}` };
 }

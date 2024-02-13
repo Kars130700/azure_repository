@@ -33,6 +33,7 @@ function App() {
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [list, setList] = useState<string[]>([]);
   const [AggregatedChecked, SetAggregatedChecked] = useState<string>('false');
+  const [LifetimeChecked, SetLifetimeChecked] = useState<string>('false');
   const [YearlyChecked, SetYearlyChecked] = useState<string>('false');
   const [MonthlyChecked, SetMonthlyChecked] = useState<string>('false');
   const [DailyChecked, SetDailyChecked] = useState<string>('false');
@@ -97,7 +98,7 @@ function App() {
     console.log(aggregatedCheckedValue);
     // Trigger the ButtonState function
     request
-      .post(`/api/ButtonState?&aggregatedChecked=${AggregatedChecked}&yearlyChecked=${YearlyChecked}&monthlyChecked=${MonthlyChecked}&dailyChecked=${DailyChecked}&PDFChecked=${PDFChecked}&ExcelChecked=${ExcelChecked}}`, {
+      .post(`/api/ButtonState?&aggregatedChecked=${AggregatedChecked}&lifetimeChecked=${LifetimeChecked}&yearlyChecked=${YearlyChecked}&monthlyChecked=${MonthlyChecked}&dailyChecked=${DailyChecked}&PDFChecked=${PDFChecked}&ExcelChecked=${ExcelChecked}}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -184,6 +185,12 @@ function App() {
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Create aggregated file
                 </label>
+                <div className='box-label'>
+                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault5" onChange={() => SetLifetimeChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
+                <label className="form-check-label" htmlFor="flexCheckDefault">
+                  Display lifetime usage
+                </label>
+                </div>
                 </div>
                 <div className='box-label'>
                 <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault2" onChange={() => SetYearlyChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
