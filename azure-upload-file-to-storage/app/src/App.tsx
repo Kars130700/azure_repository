@@ -92,7 +92,8 @@ function App() {
 
   const handleFileUpload = () => {
     if (selectedFiles.length === 0) return;
-    
+    const filenames = selectedFiles.map(file => file.name);
+
     // Converts bool to string, can be more efficient
     const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
     console.log(aggregatedCheckedValue);
@@ -134,25 +135,26 @@ function App() {
                 fileArrayBuffer.byteLength > 256000
               )
                 return;
-  
+              console.log('we hebben nu de request gehad');
               const blockBlobClient = new BlockBlobClient(url);
               return blockBlobClient.uploadData(fileArrayBuffer);
             });
           });
+          
       })
     )
       .then(() => {
-        const selectedFilesList = JSON.stringify({FileNames: selectedFiles})
+        const filenames = selectedFiles.map(file => file.name);
         request
           .post('https://mimimotofunction.azurewebsites.net/api/http_trigger', {
-            aggregated: AggregatedChecked,
-            lifetime: LifetimeChecked,
-            yearly: YearlyChecked,
-            monthly: MonthlyChecked,
-            daily: DailyChecked,
-            PDFChecked: PDFChecked,
-            ExcelChecked: ExcelChecked,
-            selectedFilesList
+            'aggregated': AggregatedChecked,
+            'lifetime': LifetimeChecked,
+            'yearly': YearlyChecked,
+            'monthly': MonthlyChecked,
+            'daily': DailyChecked,
+            'PDFChecked': PDFChecked,
+            'ExcelChecked': ExcelChecked,
+            'filenames': filenames
           },
             {
             headers: {
@@ -163,7 +165,7 @@ function App() {
             // Handle errors
             console.error(error);
           });
-        console.log('we hebben nu de request gehad');
+        
         // All files uploaded successfully
         setUploadStatus('Successfully finished upload');
         // Fetch the updated file list
