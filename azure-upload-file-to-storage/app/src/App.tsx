@@ -142,6 +142,27 @@ function App() {
       })
     )
       .then(() => {
+        const selectedFilesList = JSON.stringify({FileNames: selectedFiles})
+        request
+          .post('https://mimimotofunction.azurewebsites.net/api/http_trigger', {
+            aggregated: AggregatedChecked,
+            lifetime: LifetimeChecked,
+            yearly: YearlyChecked,
+            monthly: MonthlyChecked,
+            daily: DailyChecked,
+            PDFChecked: PDFChecked,
+            ExcelChecked: ExcelChecked,
+            selectedFilesList
+          },
+            {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+          .catch((error: unknown) => {
+            // Handle errors
+            console.error(error);
+          });
         // All files uploaded successfully
         setUploadStatus('Successfully finished upload');
         // Fetch the updated file list
