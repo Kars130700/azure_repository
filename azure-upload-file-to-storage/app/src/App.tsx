@@ -163,6 +163,7 @@ function App() {
             // Handle errors
             console.error(error);
           });
+        console.log('we hebben nu de request gehad');
         // All files uploaded successfully
         setUploadStatus('Successfully finished upload');
         // Fetch the updated file list
