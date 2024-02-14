@@ -92,8 +92,6 @@ function App() {
 
   const handleFileUpload = () => {
     if (selectedFiles.length === 0) return;
-    const filenames = selectedFiles.map(file => file.name);
-
     // Converts bool to string, can be more efficient
     const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
     console.log(aggregatedCheckedValue);
