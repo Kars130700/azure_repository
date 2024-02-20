@@ -1,5 +1,5 @@
 import { BlockBlobClient } from '@azure/storage-blob';
-import { Box, Card, Button, CardMedia, Grid, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ChangeEvent, useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
