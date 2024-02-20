@@ -44,7 +44,22 @@ function App() {
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
   };
+  const handleOnEmailChange = (event : ChangeEvent<HTMLInputElement>) => {
+    const email = event.target.value;
+    setEmail(email);
+  }
+  const EmailValidation = (email : string) => {
+    // eslint-disable-next-line no-useless-escape
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+    if ( re.test(email) ) {
+        setEmail(email);
+    }
+    else {
+      console.log('error ouwe')
+    }
+
+  }
   const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
     const { target } = event;
   
@@ -97,7 +112,7 @@ function App() {
     // Converts bool to string, can be more efficient
     const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
     console.log(aggregatedCheckedValue);
-    console.log(email);
+    EmailValidation(email);
     
     Promise.all(
       selectedFiles.map((file) => {
@@ -251,9 +266,7 @@ function App() {
                 size='small'
                 color='secondary'
                 value={email}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setEmail(event.target.value);
-                }}
+                onChange={ handleOnEmailChange }
               />
               </div>
               <div className='upload-button-div'>
