@@ -1,5 +1,5 @@
 import { BlockBlobClient } from '@azure/storage-blob';
-import { Box, Card, Button, CardMedia, Grid, Typography, TextField} from '@mui/material';
+import { Box, Card, Button, CardMedia, Grid, Typography, TextField, Alert} from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ChangeEvent, useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
@@ -274,8 +274,8 @@ function App() {
                   Upload
                 </Button>
               </div>
-              
           </div>
+          <Alert severity="error">This is an error Alert.</Alert>
           {/* App Title */}
           <Typography variant="h4" gutterBottom>
             Upload file to Azure Storage
