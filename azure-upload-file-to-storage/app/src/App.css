@@ -39,7 +39,7 @@ input::-webkit-file-upload-button {
     border-radius: 25px;
     margin: 0 auto;
     margin-top: 100px;
-    height: 550px;
+    height: 600px;
     width: 700px;
     display:flex;
     flex-wrap: wrap;
@@ -73,15 +73,15 @@ h2 {
     text-align: center;
 }
 .checkboxes-left{
-    height: 7rem;
+    height: 9rem;
     flex: 32%;
     display: flex;
     flex-direction: column;
-    text-align: right;
+    text-align: left;
     padding-right: 20px;
 }
 .checkboxes-right{
-    height: 7rem;
+    height: 9rem;
     flex: 32%;
     display: flex;
     flex-direction: column;

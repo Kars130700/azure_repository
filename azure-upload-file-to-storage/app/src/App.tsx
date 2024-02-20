@@ -1,5 +1,5 @@
 import { BlockBlobClient } from '@azure/storage-blob';
-import { Box, Card, Button, CardMedia, Grid, Typography } from '@mui/material';
+import { Box, Card, Button, CardMedia, Grid, Typography, TextField} from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ChangeEvent, useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
@@ -32,6 +32,7 @@ function App() {
   const [sasTokenUrl, setSasTokenUrl] = useState<string>('');
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [list, setList] = useState<string[]>([]);
+  const [email, setEmail] = useState('');
   const [AggregatedChecked, SetAggregatedChecked] = useState<string>('false');
   const [LifetimeChecked, SetLifetimeChecked] = useState<string>('false');
   const [YearlyChecked, SetYearlyChecked] = useState<string>('false');
@@ -43,6 +44,7 @@ function App() {
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
   };
+
   const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
     const { target } = event;
   
@@ -95,6 +97,7 @@ function App() {
     // Converts bool to string, can be more efficient
     const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
     console.log(aggregatedCheckedValue);
+    console.log(email);
     
     Promise.all(
       selectedFiles.map((file) => {
@@ -132,6 +135,7 @@ function App() {
     )
       .then(() => {
         const filenames = selectedFiles.map(file => file.name);
+        
         request
           .post('https://mimimotofunction.azurewebsites.net/api/http_trigger', {
             'aggregated': AggregatedChecked,
@@ -141,7 +145,8 @@ function App() {
             'daily': DailyChecked,
             'PDFChecked': PDFChecked,
             'ExcelChecked': ExcelChecked,
-            'filenames': filenames
+            'filenames': filenames,
+            'email': email
           },
             {
             headers: {
@@ -238,10 +243,25 @@ function App() {
               </div>
               <div className='filler'></div>
               <div className='upload-button-div'>
+              <TextField
+                required
+                id="outlined-required"
+                label="E-mail"
+                helperText='*Required'
+                size='small'
+                color='secondary'
+                value={email}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  setEmail(event.target.value);
+                }}
+              />
+              </div>
+              <div className='upload-button-div'>
                 <Button component="label" color='secondary' variant="contained" startIcon={<CloudUploadIcon />} onClick={handleFileUpload}>
                   Upload
                 </Button>
               </div>
+              
           </div>
           {/* App Title */}
           <Typography variant="h4" gutterBottom>
