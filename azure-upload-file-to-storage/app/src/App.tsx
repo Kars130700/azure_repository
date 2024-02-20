@@ -1,5 +1,5 @@
 import { BlockBlobClient } from '@azure/storage-blob';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Card, Button, CardMedia, Grid, Typography } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ChangeEvent, useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
@@ -242,7 +242,42 @@ function App() {
                   Upload
                 </Button>
               </div>
-          </div>       
+          </div>
+          {/* App Title */}
+          <Typography variant="h4" gutterBottom>
+            Upload file to Azure Storage
+          </Typography>
+          <Typography variant="h5" gutterBottom>
+            with SAS token
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            <b>Container: {containerName}</b>
+          </Typography>
+
+          {/* File Selection Section */}
+          <Box
+            display="block"
+            justifyContent="left"
+            alignItems="left"
+            flexDirection="column"
+            my={4}
+          >
+            <Button variant="contained" component="label">
+             Select Files
+            <input type="file" hidden multiple onChange={handleFileSelection} />
+            </Button>
+            {selectedFiles.length > 0 && (
+              <Box my={2}>
+                <Typography variant="body2">Selected Files:</Typography>
+                <ul>
+                  {selectedFiles.map((file) => (
+                    <li key={file.name}>{file.name}</li>
+                  ))}
+                </ul>
+              </Box>
+            )}
+          </Box>
+ 
           SAS Token Section
           {selectedFiles && (
             <Box
@@ -262,6 +297,48 @@ function App() {
               )}
             </Box>
           )} 
+
+          {/* File Upload Section */}
+          {selectedFiles && (
+            <Box
+              display="block"
+              justifyContent="left"
+              alignItems="left"
+              flexDirection="column"
+              my={4}
+            >
+              <Button variant="contained" onClick={handleFileUpload}>
+                Upload
+              </Button>
+              {uploadStatus && (
+                <Box my={2}>
+                  <Typography variant="body2" gutterBottom>
+                    {uploadStatus}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          )}
+
+          {/* Uploaded Files Display */}
+          <Grid container spacing={2}>
+            {list.map((item) => (
+              <Grid item xs={6} sm={4} md={3} key={item}>
+                <Card>
+                  {item.endsWith('.jpg') ||
+                  item.endsWith('.png') ||
+                  item.endsWith('.jpeg') ||
+                  item.endsWith('.gif') ? (
+                    <CardMedia component="img" image={item} alt={item} />
+                  ) : (
+                    <Typography variant="body1" gutterBottom>
+                      {item}
+                    </Typography>
+                  )}
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
         </Box>
       </ErrorBoundary>
     </div>
