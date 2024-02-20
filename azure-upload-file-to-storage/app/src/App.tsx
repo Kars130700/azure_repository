@@ -1,5 +1,5 @@
 import { BlockBlobClient } from '@azure/storage-blob';
-import { Box, Card, Button, CardMedia, Grid, Typography, TextField, Alert} from '@mui/material';
+import { Box, Card, Button, CardMedia, Grid, Typography, TextField } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ChangeEvent, useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
@@ -8,6 +8,8 @@ import { convertFileToArrayBuffer } from './lib/convert-file-to-arraybuffer';
 import DragDropFile from './components/dragAndDrop';
 import axios, { AxiosResponse } from 'axios';
 import './App.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Used only htmlFor local development
 const API_SERVER = import.meta.env.VITE_API_SERVER as string;
@@ -40,6 +42,11 @@ function App() {
   const [DailyChecked, SetDailyChecked] = useState<string>('false');
   const [PDFChecked, SetPDFChecked] = useState<string>('false');
   const [ExcelChecked, SetExcelChecked] = useState<string>('false');
+  const notify = () =>  {
+        toast.error("Error: incorrect email", {
+        position: "bottom-center"
+      })
+    };
 
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
@@ -56,7 +63,7 @@ function App() {
         setEmail(email);
     }
     else {
-      console.log('error ouwe')
+      notify()
     }
 
   }
@@ -274,8 +281,8 @@ function App() {
                   Upload
                 </Button>
               </div>
+              <ToastContainer />
           </div>
-          <Alert severity="error">This is an error Alert.</Alert>
           {/* App Title */}
           <Typography variant="h4" gutterBottom>
             Upload file to Azure Storage
