@@ -1,5 +1,5 @@
 import { BlockBlobClient } from '@azure/storage-blob';
-import { Box, Card, Button, CardMedia, Grid, Typography, TextField } from '@mui/material';
+import { Box, Button, Typography, TextField } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ChangeEvent, useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
@@ -24,9 +24,6 @@ const request = axios.create({
 type SasResponse = {
   url: string;
 };
-type ListResponse = {
-  list: string[];
-};
 interface InputData {
   aggregated: string;
   lifetime: string;
@@ -45,7 +42,6 @@ function App() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [sasTokenUrl, setSasTokenUrl] = useState<string>('');
   const [uploadStatus, setUploadStatus] = useState<string>('');
-  const [list, setList] = useState<string[]>([]);
   const [email, setEmail] = useState('');
   const [AggregatedChecked, SetAggregatedChecked] = useState<string>('false');
   const [LifetimeChecked, SetLifetimeChecked] = useState<string>('false');
@@ -219,6 +215,7 @@ function App() {
           })
           .catch((error: unknown) => {
             // Handle errors
+            notifyError('Something went wrong, please try again');
             console.error(error);
           });
         
@@ -227,16 +224,11 @@ function App() {
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
-      .then((result: AxiosResponse<ListResponse>) => {
-        // Update the file list
-        const { data } = result;
-        const { list } = data;
-        setList(list);
-      })
       .catch((error: unknown) => {
         // Handle errors
         if (error instanceof Error) {
           const { message, stack } = error;
+          notifyError(message);
           setUploadStatus(
             `Failed to finish upload with error: ${message} ${stack || ''}`
           );
@@ -397,24 +389,7 @@ function App() {
           )}
 
           {/* Uploaded Files Display */}
-          <Grid container spacing={2}>
-            {list.map((item) => (
-              <Grid item xs={6} sm={4} md={3} key={item}>
-                <Card>
-                  {item.endsWith('.jpg') ||
-                  item.endsWith('.png') ||
-                  item.endsWith('.jpeg') ||
-                  item.endsWith('.gif') ? (
-                    <CardMedia component="img" image={item} alt={item} />
-                  ) : (
-                    <Typography variant="body1" gutterBottom>
-                      {item}
-                    </Typography>
-                  )}
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+          
         </Box>
       </ErrorBoundary>
     </div>
