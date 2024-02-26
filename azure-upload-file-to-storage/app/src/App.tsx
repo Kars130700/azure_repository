@@ -27,6 +27,18 @@ type SasResponse = {
 type ListResponse = {
   list: string[];
 };
+interface InputData {
+  aggregated: string;
+  lifetime: string;
+  yearly: string;
+  monthly: string;
+  daily: string;
+  PDFChecked: string;
+  ExcelChecked: string;
+  filenames: string[];
+  email: string;
+}
+type ValidKeys = 'lifetime' | 'yearly' | 'monthly' | 'daily' | 'PDFChecked' | 'ExcelChecked';
 
 function App() {
   const containerName = `upload`;
@@ -37,17 +49,39 @@ function App() {
   const [email, setEmail] = useState('');
   const [AggregatedChecked, SetAggregatedChecked] = useState<string>('false');
   const [LifetimeChecked, SetLifetimeChecked] = useState<string>('false');
-  const [YearlyChecked, SetYearlyChecked] = useState<string>('false');
   const [MonthlyChecked, SetMonthlyChecked] = useState<string>('false');
   const [DailyChecked, SetDailyChecked] = useState<string>('false');
   const [PDFChecked, SetPDFChecked] = useState<string>('false');
   const [ExcelChecked, SetExcelChecked] = useState<string>('false');
-  const notify = () =>  {
-        toast.error("Error: incorrect email", {
+  const notifyError = (text : string) =>  {
+        toast.error(text, {
         position: "bottom-center"
       })
     };
+  const notifyUpload = (text : string) =>  {
+      toast.success(text, {
+      position: "bottom-center"
+    })
+  };
+  const handleOutputChange = (input : string) => {
+    if (input === 'PDF') {
+      SetPDFChecked('true');
+      SetExcelChecked('false');
+    } else if (input === 'Excel') {
+      SetPDFChecked('false');
+      SetExcelChecked('true');
+    }
+  };
 
+  const validateInputs = (data: InputData) => {
+    const timePeriods: ValidKeys[] = ['lifetime', 'yearly', 'monthly', 'daily'];
+    const fileFormats: ValidKeys[] = ['PDFChecked', 'ExcelChecked'];
+
+    const isValidTimePeriod = timePeriods.some((period) => data[period] === 'true');
+    const isValidFileFormat = fileFormats.some((format) => data[format] === 'true');
+
+    return isValidTimePeriod && isValidFileFormat;
+  };
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
   };
@@ -63,7 +97,7 @@ function App() {
         setEmail(email);
     }
     else {
-      notify()
+      notifyError('Please provide a valid email address')
     }
 
   }
@@ -115,7 +149,26 @@ function App() {
   };
 
   const handleFileUpload = () => {
-    if (selectedFiles.length === 0) return;
+    if (selectedFiles.length == 0) {
+      notifyError('No files are selected');
+      return;
+    }
+    const filenames = selectedFiles.map(file => file.name);
+    const inputs = {
+      'aggregated': AggregatedChecked,
+      'lifetime': LifetimeChecked,
+      'yearly': 'false',
+      'monthly': MonthlyChecked,
+      'daily': DailyChecked,
+      'PDFChecked': PDFChecked,
+      'ExcelChecked': ExcelChecked,
+      'filenames': filenames,
+      'email': email
+    }
+    if (!validateInputs(inputs)) {
+      notifyError('Please select a time period and filetype')
+      return;
+    }
     // Converts bool to string, can be more efficient
     const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
     console.log(aggregatedCheckedValue);
@@ -156,20 +209,9 @@ function App() {
       })
     )
       .then(() => {
-        const filenames = selectedFiles.map(file => file.name);
-        
+
         request
-          .post('https://mimimotofunction.azurewebsites.net/api/http_trigger', {
-            'aggregated': AggregatedChecked,
-            'lifetime': LifetimeChecked,
-            'yearly': YearlyChecked,
-            'monthly': MonthlyChecked,
-            'daily': DailyChecked,
-            'PDFChecked': PDFChecked,
-            'ExcelChecked': ExcelChecked,
-            'filenames': filenames,
-            'email': email
-          },
+          .post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs,
             {
             headers: {
               'Content-Type': 'application/json',
@@ -181,7 +223,7 @@ function App() {
           });
         
         // All files uploaded successfully
-        setUploadStatus('Successfully finished upload');
+        notifyUpload('Successfully finished upload');
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
@@ -223,17 +265,11 @@ function App() {
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Create aggregated file
                 </label>
+                </div>
                 <div className='box-label'>
                 <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault5" onChange={() => SetLifetimeChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
                 <label className="form-check-label" htmlFor="flexCheckDefault">
                   Display lifetime usage
-                </label>
-                </div>
-                </div>
-                <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault2" onChange={() => SetYearlyChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
-                <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Display usage per year
                 </label>
                 </div>
                 <div className='box-label'>
@@ -251,13 +287,13 @@ function App() {
                 </label>
                 </div>
                 <div className='box-label'>
-                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={() => SetPDFChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))} />
+                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={() => handleOutputChange('PDF')}/>
                 <label className="form-check-label" htmlFor="flexRadioDefault1">
                   Create PDF file
                 </label>
                 </div>  
                 <div className='box-label'> 
-                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onChange={() => SetExcelChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
+                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onChange={() => handleOutputChange('Excel')}/>
                 <label className="form-check-label" htmlFor="flexRadioDefault2">
                   Create excel file
                 </label>
@@ -386,5 +422,4 @@ function App() {
    </> 
   );
 }
-
 export default App;
