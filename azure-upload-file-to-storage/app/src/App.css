@@ -7,6 +7,7 @@
 */
 .body {
     background-color: rgb(241, 241, 241);
+    height: 100vh;
 }
 .test {
     background-color: brown;

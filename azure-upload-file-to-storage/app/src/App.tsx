@@ -90,9 +90,11 @@ function App() {
 
     if ( re.test(email) ) {
         setEmail(email);
+        return true;
     }
     else {
       notifyError('Please provide a valid email address')
+      return false;
     }
 
   }
@@ -120,7 +122,7 @@ function App() {
     // Converts bool to string, can be more efficient
     const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
     console.log(aggregatedCheckedValue);
-    EmailValidation(email);
+    if(!EmailValidation(email)) {return}
     
     Promise.all(
       selectedFiles.map((file) => {
