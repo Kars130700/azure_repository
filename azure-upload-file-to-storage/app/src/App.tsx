@@ -202,9 +202,9 @@ function App() {
         <Box>
           <div className='backgroundDragDrop'>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto&display=swap"/>
-            <h1 className='h1'>Upload files</h1>
+            <h1 style={{ fontSize: '2em' }}>Upload files</h1>
             <DragDropFile onFilesAccepted={handleFilesAccepted}></DragDropFile>
-            <h2>Export options</h2>
+            <h2 style={{ fontSize: '1.5em' }}>Export options</h2>
               <div className='filler'></div>
               <div className='checkboxes-left'>
                 <div className='box-label'>
