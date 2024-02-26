@@ -1,5 +1,5 @@
 import { BlockBlobClient } from '@azure/storage-blob';
-import { Box, Button, Typography, TextField } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ChangeEvent, useState } from 'react';
 import ErrorBoundary from './components/error-boundary';
@@ -40,7 +40,6 @@ type ValidKeys = 'lifetime' | 'yearly' | 'monthly' | 'daily' | 'PDFChecked' | 'E
 function App() {
   const containerName = `upload`;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [sasTokenUrl, setSasTokenUrl] = useState<string>('');
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [email, setEmail] = useState('');
   const [AggregatedChecked, SetAggregatedChecked] = useState<string>('false');
@@ -97,53 +96,6 @@ function App() {
     }
 
   }
-  const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
-    const { target } = event;
-  
-    if (!(target instanceof HTMLInputElement)) return;
-    if (!target.files || target.files.length === 0) return;
-  
-    // Convert FileList to array and update state
-    const filesArray = Array.from(target.files);
-    setSelectedFiles(filesArray);
-  
-    // Reset other states
-    setSasTokenUrl('');
-    setUploadStatus('');
-  };
-
-  const handleFileSasToken = () => {
-    const permission = 'w'; //write
-    const timerange = 5; //minutes
-
-    if (!selectedFiles[0]) return;
-
-    request
-      .post(
-        `/api/sas?file=${encodeURIComponent(
-          selectedFiles[0].name
-        )}&permission=${permission}&container=${containerName}&timerange=${timerange}`,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      )
-      .then((result: AxiosResponse<SasResponse>) => {
-        const { data } = result;
-        const { url } = data;
-        setSasTokenUrl(url);
-      })
-      .catch((error: unknown) => {
-        if (error instanceof Error) {
-          const { message, stack } = error;
-          setSasTokenUrl(`Error getting sas token: ${message} ${stack || ''}`);
-        } else {
-          setUploadStatus(error as string);
-        }
-      });
-  };
-
   const handleFileUpload = () => {
     if (selectedFiles.length == 0) {
       notifyError('No files are selected');
@@ -201,6 +153,7 @@ function App() {
               return blockBlobClient.uploadData(fileArrayBuffer);
             });
           });
+          console.log(uploadStatus)
           
       })
     )
@@ -311,85 +264,6 @@ function App() {
               </div>
               <ToastContainer />
           </div>
-          {/* App Title */}
-          <Typography variant="h4" gutterBottom>
-            Upload file to Azure Storage
-          </Typography>
-          <Typography variant="h5" gutterBottom>
-            with SAS token
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            <b>Container: {containerName}</b>
-          </Typography>
-
-          {/* File Selection Section */}
-          <Box
-            display="block"
-            justifyContent="left"
-            alignItems="left"
-            flexDirection="column"
-            my={4}
-          >
-            <Button variant="contained" component="label">
-             Select Files
-            <input type="file" hidden multiple onChange={handleFileSelection} />
-            </Button>
-            {selectedFiles.length > 0 && (
-              <Box my={2}>
-                <Typography variant="body2">Selected Files:</Typography>
-                <ul>
-                  {selectedFiles.map((file) => (
-                    <li key={file.name}>{file.name}</li>
-                  ))}
-                </ul>
-              </Box>
-            )}
-          </Box>
- 
-          SAS Token Section
-          {selectedFiles && (
-            <Box
-              display="block"
-              justifyContent="left"
-              alignItems="left"
-              flexDirection="column"
-              my={4}
-            >
-              <Button variant="contained" onClick={handleFileSasToken}>
-                Get SAS Token
-              </Button>
-              {sasTokenUrl && (
-                <Box my={2}>
-                  <Typography variant="body2">{sasTokenUrl}</Typography>
-                </Box>
-              )}
-            </Box>
-          )} 
-
-          {/* File Upload Section */}
-          {selectedFiles && (
-            <Box
-              display="block"
-              justifyContent="left"
-              alignItems="left"
-              flexDirection="column"
-              my={4}
-            >
-              <Button variant="contained" onClick={handleFileUpload}>
-                Upload
-              </Button>
-              {uploadStatus && (
-                <Box my={2}>
-                  <Typography variant="body2" gutterBottom>
-                    {uploadStatus}
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          )}
-
-          {/* Uploaded Files Display */}
-          
         </Box>
       </ErrorBoundary>
     </div>
