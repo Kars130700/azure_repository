@@ -1,14 +1,14 @@
 import { BlockBlobClient } from '@azure/storage-blob';
 import { Box, Button, TextField } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState, useRef } from 'react';
 import ErrorBoundary from './components/error-boundary';
 import NavBar from './components/navbar';
 import { convertFileToArrayBuffer } from './lib/convert-file-to-arraybuffer';
 import DragDropFile from './components/dragAndDrop';
 import axios, { AxiosResponse } from 'axios';
 import './App.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { Id, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Used only htmlFor local development
@@ -53,11 +53,14 @@ function App() {
         position: "bottom-center"
       })
     };
-  const notifyUpload = (text : string) =>  {
-      toast.success(text, {
-      position: "bottom-center"
-    })
-  };
+  // const notifyUpload = (text : string) =>  {
+  //     toast.success(text, {
+  //     position: "bottom-center"
+  //   })
+  // };
+  
+  const notifyUploading = useRef<Id>("")
+  
   const handleOutputChange = (input : string) => {
     if (input === 'PDF') {
       SetPDFChecked('true');
@@ -98,101 +101,104 @@ function App() {
     }
 
   }
-  const handleFileUpload = () => {
+  const filenames = selectedFiles.map(file => file.name);
+  const inputs = {
+    'aggregated': AggregatedChecked,
+    'lifetime': LifetimeChecked,
+    'yearly': 'false',
+    'monthly': MonthlyChecked,
+    'daily': DailyChecked,
+    'PDFChecked': PDFChecked,
+    'ExcelChecked': ExcelChecked,
+    'filenames': filenames,
+    'email': email
+  }
+  const validationChecks = () => {
     if (selectedFiles.length == 0) {
       notifyError('No files are selected');
-      return;
-    }
-    const filenames = selectedFiles.map(file => file.name);
-    const inputs = {
-      'aggregated': AggregatedChecked,
-      'lifetime': LifetimeChecked,
-      'yearly': 'false',
-      'monthly': MonthlyChecked,
-      'daily': DailyChecked,
-      'PDFChecked': PDFChecked,
-      'ExcelChecked': ExcelChecked,
-      'filenames': filenames,
-      'email': email
+      return false;
     }
     if (!validateInputs(inputs)) {
       notifyError('Please select a time period and filetype')
+      return false;
+    }
+    if(!EmailValidation(email)) {return false}
+    return true;
+  }
+  const fetchSasToken = (file : File) => {
+    return request
+      .post(
+        `/api/sas?file=${encodeURIComponent(file.name)}&permission=w&container=${containerName}&timerange=5`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+      .then((result: AxiosResponse<SasResponse>)  => {
+        const { data } = result;
+        return { url: data.url };
+      })
+      .catch((error) => {
+        // Handle errors or throw an exception if needed
+        console.error('Error fetching SAS token:', error);
+        throw error;
+      });
+      console.log(uploadStatus)
+  };
+  const uploadFileWithToken = (file : File, url : string) => {
+    return convertFileToArrayBuffer(file).then((fileArrayBuffer) => {
+      if (
+        fileArrayBuffer === null ||
+        fileArrayBuffer.byteLength < 1 ||
+        fileArrayBuffer.byteLength > 256000
+      ) {
+        return;
+      }
+  
+      const blockBlobClient = new BlockBlobClient(url);
+      return blockBlobClient.uploadData(fileArrayBuffer);
+    });
+  };
+  const handleFileUpload = () => {
+    if (!validationChecks()) {
       return;
     }
-    // Converts bool to string, can be more efficient
-    const aggregatedCheckedValue = AggregatedChecked ? 'true' : 'false';
-    console.log(aggregatedCheckedValue);
-    if(!EmailValidation(email)) {return}
-    
-    Promise.all(
-      selectedFiles.map((file) => {
-        // Fetch SAS token htmlFor the current file
-        return request
-          .post(
-            `/api/sas?file=${encodeURIComponent(
-              file.name
-            )}&permission=w&container=${containerName}&timerange=5`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            }
-          )
-          .then((result: AxiosResponse<SasResponse>) => {
-            const { data } = result;
-            const { url } = data;
-            console.log(`SAS Token URL htmlFor ${file.name}: ${url}`);
-            // Upload the file using the obtained SAS token
-            return convertFileToArrayBuffer(file).then((fileArrayBuffer) => {
-              if (
-                fileArrayBuffer === null ||
-                fileArrayBuffer.byteLength < 1 ||
-                fileArrayBuffer.byteLength > 256000
-              )
-                return;
-              console.log('we hebben nu de request gehad');
-              const blockBlobClient = new BlockBlobClient(url);
-              return blockBlobClient.uploadData(fileArrayBuffer);
-            });
+    const notify = () => notifyUploading.current = toast("Uploading files", {type: "info", isLoading: true, position: "bottom-center"});
+    notify()
+      Promise.all(
+        selectedFiles.map((file) => {
+          return fetchSasToken(file).then(({ url }) => {
+            return uploadFileWithToken(file, url);
           });
-          console.log(uploadStatus)
-          
-      })
-    )
+        })
+      )
+      
       .then(() => {
-
-        request
-          .post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs,
-            {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-          .catch((error: unknown) => {
-            // Handle errors
-            notifyError('Something went wrong, please try again');
-            console.error(error);
-          });
-        
+        return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      })
+      .then(() => {
         // All files uploaded successfully
-        notifyUpload('Successfully finished upload');
+        toast.update(notifyUploading.current, {render: "Upload finished succesfully", type: "success", isLoading: false, autoClose: 5000});
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
-      .catch((error: unknown) => {
+      .catch((error) => {
         // Handle errors
         if (error instanceof Error) {
           const { message, stack } = error;
-          notifyError(message);
-          setUploadStatus(
-            `Failed to finish upload with error: ${message} ${stack || ''}`
-          );
+          toast.update(notifyUploading.current, {render: message, type: "error", isLoading: false, autoClose: 5000});
+          setUploadStatus(`Failed to finish upload with error: ${message} ${stack || ''}`);
         } else {
           setUploadStatus(error as string);
         }
       });
   };
-  
+    
   return (
     <>
     <body className= 'body'>
