@@ -40,7 +40,6 @@ type ValidKeys = 'lifetime' | 'yearly' | 'monthly' | 'daily' | 'PDFChecked' | 'E
 function App() {
   const containerName = `upload`;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [uploadStatus, setUploadStatus] = useState<string>('');
   const [email, setEmail] = useState('');
   const [AggregatedChecked, SetAggregatedChecked] = useState<string>('false');
   const [LifetimeChecked, SetLifetimeChecked] = useState<string>('false');
@@ -125,6 +124,7 @@ function App() {
     if(!EmailValidation(email)) {return false}
     return true;
   }
+  
   const fetchSasToken = (file : File) => {
     return request
       .post(
@@ -140,12 +140,17 @@ function App() {
         return { url: data.url };
       })
       .catch((error) => {
-        // Handle errors or throw an exception if needed
-        console.error('Error fetching SAS token:', error);
-        throw error;
+        if (error instanceof Error) {
+          const { message, stack } = error;
+          toast.update(notifyUploading.current, {render: (`Failed to finish upload with error: ${message} ${stack || ''}`), type: "error", isLoading: false, autoClose: 5000});
+          throw error
+        } else {
+          toast.update(notifyUploading.current, {render: error as string, type: "error", isLoading: false, autoClose: 5000});
+          throw error
+        }
       });
-      console.log(uploadStatus)
   };
+  
   const uploadFileWithToken = (file : File, url : string) => {
     return convertFileToArrayBuffer(file).then((fileArrayBuffer) => {
       if (
@@ -191,10 +196,9 @@ function App() {
         // Handle errors
         if (error instanceof Error) {
           const { message, stack } = error;
-          toast.update(notifyUploading.current, {render: message, type: "error", isLoading: false, autoClose: 5000});
-          setUploadStatus(`Failed to finish upload with error: ${message} ${stack || ''}`);
+          toast.update(notifyUploading.current, {render: (`Failed to finish upload with error: ${message} ${stack || ''}`), type: "error", isLoading: false, autoClose: 5000});
         } else {
-          setUploadStatus(error as string);
+          toast.update(notifyUploading.current, {render: error as string, type: "error", isLoading: false, autoClose: 5000});
         }
       });
   };
