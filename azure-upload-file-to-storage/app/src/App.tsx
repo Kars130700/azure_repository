@@ -169,8 +169,8 @@ function App() {
     if (!validationChecks()) {
       return;
     }
-    const notify = () => notifyUploading.current = toast("Uploading files", {type: "info", isLoading: true, position: "bottom-center"});
-    notify()
+    const notify = (text : string) => notifyUploading.current = toast(text, {type: "info", isLoading: true, position: "bottom-center"});
+    notify("Uploading Files")
       Promise.all(
         selectedFiles.map((file) => {
           return fetchSasToken(file).then(({ url }) => {
@@ -180,6 +180,8 @@ function App() {
       )
       
       .then(() => {
+        toast.update("Upload complete!", {type: "info", isLoading: true, position: "bottom-center"})
+        notify("Emailing Files")
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
             'Content-Type': 'application/json',
