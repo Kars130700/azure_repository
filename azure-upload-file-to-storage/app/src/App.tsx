@@ -180,7 +180,7 @@ function App() {
       )
       
       .then(() => {
-        toast.update("Upload complete!", {type: "info", isLoading: true, position: "bottom-center"})
+        toast.update(notifyUploading.current, {render: "Uploading complete"type: "success", isLoading: false, autoClose: 5000})
         notify("Emailing Files")
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
@@ -190,7 +190,7 @@ function App() {
       })
       .then(() => {
         // All files uploaded successfully
-        toast.update(notifyUploading.current, {render: "Upload finished succesfully", type: "success", isLoading: false, autoClose: 5000});
+        toast.update(notifyUploading.current, {render: "Emailed succesfully", type: "success", isLoading: false, autoClose: 5000});
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
