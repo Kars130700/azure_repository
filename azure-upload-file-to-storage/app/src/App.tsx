@@ -180,7 +180,7 @@ function App() {
       )
       
       .then(() => {
-        toast.update(notifyUploading.current, {render: "Uploading complete"type: "success", isLoading: false, autoClose: 5000})
+        toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Emailing Files")
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
