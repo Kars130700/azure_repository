@@ -10,6 +10,12 @@ import axios, { AxiosResponse } from 'axios';
 import './App.css';
 import { Id, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import StickyHeadTable from './components/stoveTable';
 
 // Used only htmlFor local development
 const API_SERVER = import.meta.env.VITE_API_SERVER as string;
@@ -47,6 +53,7 @@ function App() {
   const [DailyChecked, SetDailyChecked] = useState<string>('false');
   const [PDFChecked, SetPDFChecked] = useState<string>('false');
   const [ExcelChecked, SetExcelChecked] = useState<string>('false');
+  const [dateDialogOpen, SetDateDialogOpen] = useState(false);
   const notifyError = (text : string) =>  {
         toast.error(text, {
         position: "bottom-center"
@@ -58,8 +65,18 @@ function App() {
   //   })
   // };
   
-  const notifyUploading = useRef<Id>("")
+  const notifyUploading = useRef<Id>("");
   
+  const handleOpenDateDialog = () => { 
+    SetDateDialogOpen(true);
+  };
+
+  const handleCloseDateDialog = () => {
+    SetDateDialogOpen(false);
+    // StickyHeadTable.setRowIndex(-1);
+    // setColumn("");
+  };
+
   const handleOutputChange = (input : string) => {
     if (input === 'PDF') {
       SetPDFChecked('true');
@@ -160,7 +177,6 @@ function App() {
       ) {
         return;
       }
-  
       const blockBlobClient = new BlockBlobClient(url);
       return blockBlobClient.uploadData(fileArrayBuffer);
     });
@@ -259,6 +275,33 @@ function App() {
                 </div>  
               </div>
               <div className='filler'></div>
+              <div className='upload-button-div'>
+                <Button variant="outlined" onClick={handleOpenDateDialog}>
+                Open form dialog
+                </Button>
+                <Dialog
+                  open={dateDialogOpen}
+                  onClose={handleCloseDateDialog}
+                  PaperProps={{
+                    component: 'form',
+                    onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+                      event.preventDefault();
+                      handleCloseDateDialog();
+                    },
+                  }}>
+                  <DialogTitle>Subscribe</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Indicate the date of data collection for each stove.
+                    </DialogContentText>
+                    <StickyHeadTable/>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleCloseDateDialog}>Cancel</Button>
+                    <Button type="submit">Submit</Button>
+                  </DialogActions>
+                </Dialog>
+              </div>
               <div className='upload-button-div'>
               <TextField
                 required

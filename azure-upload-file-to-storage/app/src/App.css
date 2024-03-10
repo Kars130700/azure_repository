@@ -40,7 +40,7 @@ input::-webkit-file-upload-button {
     border-radius: 25px;
     margin: 0 auto;
     margin-top: 100px;
-    height: 600px;
+    height: 800px;
     width: 700px;
     display:flex;
     flex-wrap: wrap;
@@ -73,7 +73,7 @@ h2 {
 .filler{
     height: 3rem;
     flex: 18%;
-    text-align: center;
+    border: 1px solid red;
 }
 .checkboxes-left{
     height: 9rem;
@@ -100,16 +100,10 @@ h2 {
     display: flex;
     justify-content: center;
     align-content: center;
-    margin-bottom: 20px;
+    border: 1px solid red;
 }
 .upload-button2 {
     border: 1px solid rgb(219, 28, 28);
     border-radius: 5%;
     background-color: rgb(0, 0, 0);
-}
-.get-sas-token .status .text{
-
-    flex-grow: 1;
-    background-color: pink;
-   
 }
