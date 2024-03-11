@@ -43,6 +43,24 @@ interface InputData {
 }
 type ValidKeys = 'lifetime' | 'yearly' | 'monthly' | 'daily' | 'PDFChecked' | 'ExcelChecked';
 
+interface Data {
+  name: string;
+  location: string;
+  date: number;
+}
+
+function createData(
+  name: string,
+  location: string,
+  date: number,
+): Data {
+  return { name, location, date};
+}
+
+function removeExtension(filename : string): string{
+  return filename.replace(/\.[^/.]+$/, "")
+}
+
 function App() {
   const containerName = `upload`;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -57,6 +75,9 @@ function App() {
 
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
+  const [location, setLocation] = useState("");
+  const [date, setDate] = useState(202020);
+  const [rows, setRows] = useState<Data[]>([])
 
   const notifyError = (text : string) =>  {
         toast.error(text, {
@@ -100,8 +121,14 @@ function App() {
 
     return isValidTimePeriod && isValidFileFormat;
   };
+
+  //debug, would be better if the array became empty after the user selected the files (not on pressing the upload box)
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
+    rows.length = 0
+    files.forEach((file) => {rows.push(createData(removeExtension(file.name), location, date))})
+    setRows(rows)
+    console.log(rows)
   };
   const handleOnEmailChange = (event : ChangeEvent<HTMLInputElement>) => {
     const email = event.target.value;
@@ -224,7 +251,7 @@ function App() {
         }
       });
   };
-    
+
   return (
     <>
     <body className= 'body'>
@@ -298,7 +325,7 @@ function App() {
                     <DialogContentText>
                       Indicate the date of data collection for each stove.
                     </DialogContentText>
-                    <StickyHeadTable rowIndex={rowIndex} setRowIndex = {setRowIndex} columnIndex={columnIndex} setColumn={setColumn}/>
+                    <StickyHeadTable rowIndex={rowIndex} setRowIndex = {setRowIndex} columnIndex={columnIndex} setColumn={setColumn} rows={rows}/>
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={handleCloseDateDialog}>Cancel</Button>

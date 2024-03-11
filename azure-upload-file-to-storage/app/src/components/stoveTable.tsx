@@ -8,6 +8,11 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { TextField } from '@mui/material';
+// import dayjs, { Dayjs } from 'dayjs';
+// import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 interface Column {
   id: 'name' | 'location' | 'date';
@@ -15,6 +20,11 @@ interface Column {
   minWidth?: number;
   align?: 'right';
   format?: (value: number) => string;
+}
+interface Data {
+  name: string;
+  location: string;
+  date: number;
 }
 
 const columns: readonly Column[] = [
@@ -29,32 +39,15 @@ const columns: readonly Column[] = [
   },
 ];
 
-interface Data {
-  name: string;
-  location: string;
-  date: number;
-}
-
-function createData(
-  name: string,
-  location: string,
-  date: number,
-): Data {
-  return { name, location, date};
-}
-
-const rows = [
-  createData("31000227", "Rwanda, Kigali", 102023)
-];
-
 interface StickyHeadTableProps {
   rowIndex: number;
   setRowIndex: React.Dispatch<React.SetStateAction<number>>;
   columnIndex: string;
   setColumn: React.Dispatch<React.SetStateAction<string>>
+  rows : Data[];
 }
 
-export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, setColumn}: StickyHeadTableProps) {
+export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, setColumn, rows}: StickyHeadTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -99,13 +92,23 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
-                        <TableCell 
-                          onClick={ () => {setRowIndex(index), setColumn(column.id)}}
-                          key={column.id} 
+                        <TableCell
+                          onClick={() => {setRowIndex(index); setColumn(column.id)}}
+                          key={column.id}
                           align={column.align}
                         >
                           {rowIndex === index && columnIndex === column.id ? (
-                            <TextField />
+                            column.id === "location" ? (
+                              <TextField
+                                size='small'
+                                label={column.id.charAt(0).toUpperCase() + column.id.slice(1)}
+                              />
+                            ) : (
+                              <DatePicker
+                                label="Controlled picker"
+                                value={value}
+                              />
+                            )
                           ) : (
                             column.format && typeof value === 'number' ? (
                               column.format(value)
