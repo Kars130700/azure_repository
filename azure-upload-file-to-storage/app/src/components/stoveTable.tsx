@@ -8,11 +8,11 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { TextField } from '@mui/material';
-// import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 // import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+//import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 interface Column {
   id: 'name' | 'location' | 'date';
@@ -104,10 +104,14 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
                                 label={column.id.charAt(0).toUpperCase() + column.id.slice(1)}
                               />
                             ) : (
-                              <DatePicker
-                                label="Controlled picker"
-                                value={value}
+                              <TextField
+                                size='small'
+                                label={column.id.charAt(0).toUpperCase() + column.id.slice(1)}
                               />
+                              // <DatePicker
+                              //   label="Controlled picker"
+                              //   value={value}
+                              // />
                             )
                           ) : (
                             column.format && typeof value === 'number' ? (
