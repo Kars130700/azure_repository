@@ -54,6 +54,10 @@ function App() {
   const [PDFChecked, SetPDFChecked] = useState<string>('false');
   const [ExcelChecked, SetExcelChecked] = useState<string>('false');
   const [dateDialogOpen, SetDateDialogOpen] = useState(false);
+
+  const [rowIndex, setRowIndex] = useState(-1);
+  const [columnIndex, setColumn] = useState("");
+
   const notifyError = (text : string) =>  {
         toast.error(text, {
         position: "bottom-center"
@@ -70,13 +74,13 @@ function App() {
   const handleOpenDateDialog = () => { 
     SetDateDialogOpen(true);
   };
-
+  
   const handleCloseDateDialog = () => {
     SetDateDialogOpen(false);
-    // StickyHeadTable.setRowIndex(-1);
-    // setColumn("");
+    setRowIndex(-1);
+    setColumn("");
   };
-
+  
   const handleOutputChange = (input : string) => {
     if (input === 'PDF') {
       SetPDFChecked('true');
@@ -294,7 +298,7 @@ function App() {
                     <DialogContentText>
                       Indicate the date of data collection for each stove.
                     </DialogContentText>
-                    <StickyHeadTable/>
+                    <StickyHeadTable rowIndex={rowIndex} setRowIndex = {setRowIndex} columnIndex={columnIndex} setColumn={setColumn}/>
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={handleCloseDateDialog}>Cancel</Button>

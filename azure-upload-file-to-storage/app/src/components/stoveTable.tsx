@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useState } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -48,13 +47,19 @@ const rows = [
   createData("31000227", "Rwanda, Kigali", 102023)
 ];
 
-export default function StickyHeadTable() {
+interface StickyHeadTableProps {
+  rowIndex: number;
+  setRowIndex: React.Dispatch<React.SetStateAction<number>>;
+  columnIndex: string;
+  setColumn: React.Dispatch<React.SetStateAction<string>>
+}
+
+export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, setColumn}: StickyHeadTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [rowIndex, setRowIndex] = useState(-1);
-  const [columnIndex, setColumn] = useState("");
 
   const handleChangePage = (event: unknown, newPage: number) => {
+    console.log(event)
     setPage(newPage);
     setRowIndex(-1);
     setColumn("");
@@ -99,12 +104,15 @@ export default function StickyHeadTable() {
                           key={column.id} 
                           align={column.align}
                         >
-                          { rowIndex === index && columnIndex === column.id ?
-                          <TextField/> :
-                          value}
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
+                          {rowIndex === index && columnIndex === column.id ? (
+                            <TextField />
+                          ) : (
+                            column.format && typeof value === 'number' ? (
+                              column.format(value)
+                            ) : (
+                              value
+                            )
+                          )}
                         </TableCell>
                       );
                     })}
