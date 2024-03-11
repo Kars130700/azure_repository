@@ -10,9 +10,9 @@ import TableRow from '@mui/material/TableRow';
 import { TextField } from '@mui/material';
 //import dayjs, { Dayjs } from 'dayjs';
 // import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-//import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 interface Column {
   id: 'name' | 'location' | 'date';
@@ -65,6 +65,7 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table 
           stickyHeader 
@@ -104,14 +105,10 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
                                 label={column.id.charAt(0).toUpperCase() + column.id.slice(1)}
                               />
                             ) : (
-                              <TextField
-                                size='small'
-                                label={column.id.charAt(0).toUpperCase() + column.id.slice(1)}
+                              <DatePicker
+                                label="Controlled picker"
+                                slotProps={{ textField: { size: 'small' } }}
                               />
-                              // <DatePicker
-                              //   label="Controlled picker"
-                              //   value={value}
-                              // />
                             )
                           ) : (
                             column.format && typeof value === 'number' ? (
@@ -138,6 +135,7 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+      </LocalizationProvider>
     </Paper>
   );
 }
