@@ -75,8 +75,8 @@ function App() {
 
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
-  const [location, setLocation] = useState("");
-  const [date, setDate] = useState(202020);
+  // const [location, setLocation] = useState("");
+  // const [date, setDate] = useState(202020);
   const [rows, setRows] = useState<Data[]>([])
 
   const notifyError = (text : string) =>  {
@@ -126,7 +126,7 @@ function App() {
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
     rows.length = 0
-    files.forEach((file) => {rows.push(createData(removeExtension(file.name), location, date))})
+    files.forEach((file) => {rows.push(createData(removeExtension(file.name), "", 202020))})
     setRows(rows)
     console.log(rows)
   };
