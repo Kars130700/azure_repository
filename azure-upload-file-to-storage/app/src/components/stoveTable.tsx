@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { TextField } from '@mui/material';
-//import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 // import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -24,7 +24,7 @@ interface Column {
 interface Data {
   name: string;
   location: string;
-  date: number;
+  date: string;
 }
 
 const columns: readonly Column[] = [
@@ -45,9 +45,11 @@ interface StickyHeadTableProps {
   columnIndex: string;
   setColumn: React.Dispatch<React.SetStateAction<string>>
   rows : Data[];
+  setRows: React.Dispatch<React.SetStateAction<Data[]>>
+  handleDateFieldChange: (rowInd: number, value: Dayjs | null, allRows: boolean) => void;
 }
 
-export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, setColumn, rows}: StickyHeadTableProps) {
+export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, setColumn, rows, setRows, handleDateFieldChange}: StickyHeadTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -61,6 +63,12 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+
+  const handleLocationFieldChange = (rowInd: number, value: string) => {
+    console.log(rows[rowInd]["location"])
+    rows[rowInd]["location"] = value;
+    setRows(rows)
   };
 
   return (
@@ -85,45 +93,49 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => {
-                return (
+              {rows
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.location}>
                     {columns.map((column) => {
                       const value = row[column.id];
-                      return (
-                        <TableCell
-                          onClick={() => {setRowIndex(index); setColumn(column.id)}}
-                          key={column.id}
-                          align={column.align}
-                        >
-                          {rowIndex === index && columnIndex === column.id ? (
-                            column.id === "location" ? (
-                              <TextField
-                                size='small'
-                                label={column.id.charAt(0).toUpperCase() + column.id.slice(1)}
-                              />
-                            ) : (
-                              <DatePicker
-                                label="Controlled picker"
-                                slotProps={{ textField: { size: 'small' } }}
-                              />
-                            )
-                          ) : (
-                            column.format && typeof value === 'number' ? (
+                      
+                        return (
+                          <TableCell
+                            onClick={() => {
+                              setRowIndex(index);
+                              setColumn(column.id);
+                            }}
+                            key={column.id}
+                            align={column.align}
+                          >
+                            {rowIndex === index && columnIndex === column.id ? (
+                              column.id === "location" ? (
+                                <TextField
+                                  size="small"
+                                  label={column.id.charAt(0).toUpperCase() + column.id.slice(1)}
+                                  onChange={(event) => handleLocationFieldChange(rowIndex, event.target.value)}
+                                />
+                              ) : column.id === "date" ? (
+                                <DatePicker
+                                  label="Controlled picker"
+                                  slotProps={{ textField: { size: 'small' } }}
+                                  onChange={(newValue: Dayjs | null) => handleDateFieldChange(rowIndex, newValue, false)}
+                                />
+                              ) : (
+                                value.toString()
+                              )
+                            ) : column.format && typeof value === 'number' ? (
                               column.format(value)
                             ) : (
-                              value
-                            )
-                          )}
-                        </TableCell>
-                      );
+                              value.toString()
+                            )}
+                          </TableCell>
+                        );
                     })}
                   </TableRow>
-                );
-              })}
-          </TableBody>
+                ))}
+            </TableBody>
         </Table>
       </TableContainer>
       <TablePagination

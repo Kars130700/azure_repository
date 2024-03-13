@@ -16,6 +16,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import StickyHeadTable from './components/stoveTable';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
 
 // Used only htmlFor local development
 const API_SERVER = import.meta.env.VITE_API_SERVER as string;
@@ -46,13 +50,13 @@ type ValidKeys = 'lifetime' | 'yearly' | 'monthly' | 'daily' | 'PDFChecked' | 'E
 interface Data {
   name: string;
   location: string;
-  date: number;
+  date: string;
 }
 
 function createData(
   name: string,
   location: string,
-  date: number,
+  date: string,
 ): Data {
   return { name, location, date};
 }
@@ -75,7 +79,7 @@ function App() {
 
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
-  // const [location, setLocation] = useState("");
+  //const [location, setLocation] = useState("");
   // const [date, setDate] = useState(202020);
   const [rows, setRows] = useState<Data[]>([])
 
@@ -95,7 +99,32 @@ function App() {
   const handleOpenDateDialog = () => { 
     SetDateDialogOpen(true);
   };
+
+  const handleDateFieldChange = (rowInd: number, value: Dayjs | null, allRows: boolean) => {
+    if (rows.length !== 0)
+    { if (value !== null && value !== undefined)
+    { if (allRows){
+      rows.map((row) => row["date"] = value.format('MM/DD/YYYY'))
+      }
+      else {
+        rows[rowInd]["date"] = value.format('MM/DD/YYYY')
+      }
+    } else
+      { notifyError("Please select at least 1 file")}
+    }
+  };
   
+  const handleLocationChange = (rowInd: number, value: string, allRows: boolean) => {
+    if (rows.length !== 0)
+    {if (allRows) {
+      rows.map((row) => row['location'] = value)
+    }
+    else {
+      rows[rowInd]["location"] = value
+    }
+  } else {
+    notifyError("Please select at least 1 file")}
+  }
   const handleCloseDateDialog = () => {
     SetDateDialogOpen(false);
     setRowIndex(-1);
@@ -126,7 +155,7 @@ function App() {
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
     rows.length = 0
-    files.forEach((file) => {rows.push(createData(removeExtension(file.name), "", 202020))})
+    files.forEach((file) => {rows.push(createData(removeExtension(file.name), "", dayjs('2022-04-17').format('DD/MM/YYYY')))})
     setRows(rows)
     console.log(rows)
   };
@@ -307,8 +336,30 @@ function App() {
               </div>
               <div className='filler'></div>
               <div className='upload-button-div'>
-                <Button variant="outlined" onClick={handleOpenDateDialog}>
-                Open form dialog
+              <div className='filler'></div>
+              <div className='checkboxes-left'>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    className = "datepicker"
+                    label="Day of collection"
+                    slotProps={{ textField: { size: 'small' } }}
+                    defaultValue={dayjs()}
+                    onChange = {(newValue : Dayjs | null) => handleDateFieldChange(0, newValue, true)}/>
+                  <TextField
+                    required
+                    className='locationpicker'
+                    id="outlined-required"
+                    label="Location of collection"
+                    helperText='*Required'
+                    size='small'
+                    color='secondary'
+                    onChange={ (newLocation) => handleLocationChange(0, newLocation.target.value, true) }
+                  />
+                </LocalizationProvider>
+              </div>
+              <div className='checkboxes-right'>
+                <Button size= 'medium' color = 'secondary' variant="contained" onClick={handleOpenDateDialog} className='specify-button'>
+                Specify date per stove
                 </Button>
                 <Dialog
                   open={dateDialogOpen}
@@ -320,12 +371,12 @@ function App() {
                       handleCloseDateDialog();
                     },
                   }}>
-                  <DialogTitle>Subscribe</DialogTitle>
+                  <DialogTitle>Stove information</DialogTitle>
                   <DialogContent>
                     <DialogContentText>
                       Indicate the date of data collection for each stove.
                     </DialogContentText>
-                    <StickyHeadTable rowIndex={rowIndex} setRowIndex = {setRowIndex} columnIndex={columnIndex} setColumn={setColumn} rows={rows}/>
+                    <StickyHeadTable rowIndex={rowIndex} setRowIndex = {setRowIndex} columnIndex={columnIndex} setColumn={setColumn} rows={rows} setRows={setRows} handleDateFieldChange={handleDateFieldChange}/>
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={handleCloseDateDialog}>Cancel</Button>
@@ -333,6 +384,8 @@ function App() {
                   </DialogActions>
                 </Dialog>
               </div>
+              <div className='filler'></div>
+              </div>              
               <div className='upload-button-div'>
               <TextField
                 required
