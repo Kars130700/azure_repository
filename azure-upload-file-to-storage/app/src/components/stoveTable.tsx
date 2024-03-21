@@ -108,6 +108,7 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
                             }}
                             key={column.id}
                             align={column.align}
+                            style={column.id === 'location' ? { height: '73px' } : undefined}
                           >
                             {rowIndex === index && columnIndex === column.id ? (
                               column.id === "location" ? (

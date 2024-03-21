@@ -9,10 +9,8 @@ interface AcceptProps {
 const Accept: React.FC<AcceptProps> = ({ onFilesAccepted }) => {
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     accept: {
-      'image/jpeg': [],
-      'image/png': [],
-      'text/plain': [],  // Allow .txt files
-      'application/octet-stream': [],  // Allow .dat files (application/octet-stream is a generic binary type)
+      '.dat': ['.DAT', '.dat'],
+      'text/plain': [".DAT"],  // Allow .txt files
     },
     onDrop: (files) => {
       onFilesAccepted(files); // Call the callback with accepted files

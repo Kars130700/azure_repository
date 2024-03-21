@@ -97,7 +97,11 @@ function App() {
   const notifyUploading = useRef<Id>("");
   
   const handleOpenDateDialog = () => { 
-    SetDateDialogOpen(true);
+    if (selectedFiles.length == 0){
+      notifyError("Please select at least 1 file");
+  }else
+      { SetDateDialogOpen(true);}
+
   };
 
   const handleDateFieldChange = (rowInd: number, value: Dayjs | null, allRows: boolean) => {
@@ -109,8 +113,7 @@ function App() {
       else {
         rows[rowInd]["date"] = value.format('MM/DD/YYYY')
       }
-    } else
-      { notifyError("Please select at least 1 file")}
+    }
     }
   };
   
@@ -122,8 +125,7 @@ function App() {
     else {
       rows[rowInd]["location"] = value
     }
-  } else {
-    notifyError("Please select at least 1 file")}
+  } 
   }
   const handleCloseDateDialog = () => {
     SetDateDialogOpen(false);
@@ -258,6 +260,15 @@ function App() {
       .then(() => {
         toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Emailing Files")
+        return request.post('https://cmmtrigger3.azurewebsites.net/api/HttpTrigger1', inputs, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      })
+      .then(() => {
+        toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
+        notify("Emailing Files")
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
             'Content-Type': 'application/json',
@@ -370,13 +381,22 @@ function App() {
                       event.preventDefault();
                       handleCloseDateDialog();
                     },
+                  style: { maxWidth: '40vw',
+                    width: "100%",}
                   }}>
                   <DialogTitle>Stove information</DialogTitle>
                   <DialogContent>
                     <DialogContentText>
                       Indicate the date of data collection for each stove.
                     </DialogContentText>
-                    <StickyHeadTable rowIndex={rowIndex} setRowIndex = {setRowIndex} columnIndex={columnIndex} setColumn={setColumn} rows={rows} setRows={setRows} handleDateFieldChange={handleDateFieldChange}/>
+                    <StickyHeadTable 
+                    rowIndex={rowIndex} 
+                    setRowIndex = {setRowIndex} 
+                    columnIndex={columnIndex} 
+                    setColumn={setColumn} 
+                    rows={rows} 
+                    setRows={setRows} 
+                    handleDateFieldChange={handleDateFieldChange}/>
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={handleCloseDateDialog}>Cancel</Button>
