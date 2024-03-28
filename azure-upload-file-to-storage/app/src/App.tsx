@@ -159,7 +159,6 @@ function App() {
     rows.length = 0
     files.forEach((file) => {rows.push(createData(removeExtension(file.name), "", dayjs('2022-04-17').format('DD/MM/YYYY')))})
     setRows(rows)
-    console.log(rows)
   };
   const handleOnEmailChange = (event : ChangeEvent<HTMLInputElement>) => {
     const email = event.target.value;
@@ -270,7 +269,6 @@ function App() {
         toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Emailing Files")
         inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
-        console.log(inputs['filenames']);
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
             'Content-Type': 'application/json',
