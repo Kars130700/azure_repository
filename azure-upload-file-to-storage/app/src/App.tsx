@@ -270,6 +270,7 @@ function App() {
         toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Emailing Files")
         inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
+        console.log(inputs['filenames']);
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
             'Content-Type': 'application/json',
