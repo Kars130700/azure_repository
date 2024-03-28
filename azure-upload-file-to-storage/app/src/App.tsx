@@ -259,8 +259,8 @@ function App() {
       
       .then(() => {
         toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
-        notify("Emailing Files")
-        return request.post('https://cmmtrigger3.azurewebsites.net/api/HttpTrigger1', inputs, {
+        notify("Converting files")
+        return request.post('https://cmmtrigger3.azurewebsites.net/api/HttpTrigger1?', inputs, {
           headers: {
             'Content-Type': 'application/json',
           },
