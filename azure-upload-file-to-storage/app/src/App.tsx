@@ -352,7 +352,6 @@ function App() {
                     columnIndex={columnIndex} 
                     setColumn={setColumn} 
                     rows={rows} 
-                    setRows={setRows} 
                     handleDateFieldChange={handleDateFieldChange}
                     handleLocationFieldChange = {handleLocationFieldChange}/>
                   </DialogContent>
