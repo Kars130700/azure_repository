@@ -35,17 +35,14 @@ type SasResponse = {
   url: string;
 };
 interface InputData {
-  aggregated: string;
-  lifetime: string;
-  yearly: string;
-  monthly: string;
-  daily: string;
-  PDFChecked: string;
-  ExcelChecked: string;
+  PDFChecked: boolean;
+  ExcelChecked: boolean;
   filenames: string[];
   email: string;
+  // To debug, should not be Data, but string list
+  locations: string[];
+  dates: string[];
 }
-type ValidKeys = 'lifetime' | 'yearly' | 'monthly' | 'daily' | 'PDFChecked' | 'ExcelChecked';
 
 interface Data {
   name: string;
@@ -69,12 +66,8 @@ function App() {
   const containerName = `upload`;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [email, setEmail] = useState('');
-  const [AggregatedChecked, SetAggregatedChecked] = useState<string>('false');
-  const [LifetimeChecked, SetLifetimeChecked] = useState<string>('false');
-  const [MonthlyChecked, SetMonthlyChecked] = useState<string>('false');
-  const [DailyChecked, SetDailyChecked] = useState<string>('false');
-  const [PDFChecked, SetPDFChecked] = useState<string>('false');
-  const [ExcelChecked, SetExcelChecked] = useState<string>('false');
+  const [PDFChecked, SetPDFChecked] = useState<boolean>(false);
+  const [ExcelChecked, SetExcelChecked] = useState<boolean>(false);
   const [dateDialogOpen, SetDateDialogOpen] = useState(false);
 
   const [rowIndex, setRowIndex] = useState(-1);
@@ -135,22 +128,16 @@ function App() {
   
   const handleOutputChange = (input : string) => {
     if (input === 'PDF') {
-      SetPDFChecked('true');
-      SetExcelChecked('false');
+      SetPDFChecked(true);
+      SetExcelChecked(false);
     } else if (input === 'Excel') {
-      SetPDFChecked('false');
-      SetExcelChecked('true');
+      SetPDFChecked(false);
+      SetExcelChecked(true);
     }
   };
 
   const validateInputs = (data: InputData) => {
-    const timePeriods: ValidKeys[] = ['lifetime', 'yearly', 'monthly', 'daily'];
-    const fileFormats: ValidKeys[] = ['PDFChecked', 'ExcelChecked'];
-
-    const isValidTimePeriod = timePeriods.some((period) => data[period] === 'true');
-    const isValidFileFormat = fileFormats.some((format) => data[format] === 'true');
-
-    return isValidTimePeriod && isValidFileFormat;
+    return data.PDFChecked || data.ExcelChecked;
   };
 
   //debug, would be better if the array became empty after the user selected the files (not on pressing the upload box)
@@ -179,16 +166,15 @@ function App() {
 
   }
   const filenames = selectedFiles.map(file => file.name);
+  const locations = [""]
+  const dates = [""]
   const inputs = {
-    'aggregated': AggregatedChecked,
-    'lifetime': LifetimeChecked,
-    'yearly': 'false',
-    'monthly': MonthlyChecked,
-    'daily': DailyChecked,
     'PDFChecked': PDFChecked,
     'ExcelChecked': ExcelChecked,
+    'email': email,
     'filenames': filenames,
-    'email': email
+    'locations': locations,
+    'dates': dates,
   }
   const validationChecks = () => {
     if (selectedFiles.length == 0) {
@@ -196,6 +182,7 @@ function App() {
       return false;
     }
     if (!validateInputs(inputs)) {
+      console.log(inputs)
       notifyError('Please select a time period and filetype')
       return false;
     }
@@ -269,6 +256,9 @@ function App() {
         toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Emailing Files")
         inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
+        inputs.locations = rows.map(row => row.location);
+        inputs.dates = rows.map(row => row.date);
+        console.log(rows);
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
             'Content-Type': 'application/json',
@@ -305,72 +295,33 @@ function App() {
             <DragDropFile onFilesAccepted={handleFilesAccepted}></DragDropFile>
             <h2 style={{ fontSize: '1.5em' }}>Export options</h2>
               <div className='filler'></div>
-              <div className='checkboxes-left'>
-                <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault1" onChange={() => SetAggregatedChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))} / >
-                <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Create aggregated file
-                </label>
+                <div className='checkboxes-left'>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      className = "datepicker"
+                      label="Day of collection"
+                      slotProps={{ textField: { size: 'small' } }}
+                      defaultValue={dayjs()}
+                      onChange = {(newValue : Dayjs | null) => handleDateFieldChange(0, newValue, true)}/>
+                  </LocalizationProvider>
                 </div>
-                <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault5" onChange={() => SetLifetimeChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
-                <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Display lifetime usage
-                </label>
+                <div className='checkboxes-right'>
+                <TextField
+                      required
+                      className='locationpicker'
+                      id="outlined-required"
+                      label="Location of collection"
+                      helperText='*Required'
+                      size='small'
+                      color='secondary'
+                      onChange={ (newLocation) => handleLocationChange(0, newLocation.target.value, true) }
+                    />
                 </div>
-                <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault3" onChange={() => SetMonthlyChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
-                <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Display usage per month
-                </label>
-                </div>
-              </div>
-              <div className='checkboxes-right'>
-                <div className='box-label'>
-                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault4" onChange={() => SetDailyChecked(prevValue => (prevValue === 'false' ? 'true' : 'false'))}/>
-                <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Display usage per day
-                </label>
-                </div>
-                <div className='box-label'>
-                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={() => handleOutputChange('PDF')}/>
-                <label className="form-check-label" htmlFor="flexRadioDefault1">
-                  Create PDF file
-                </label>
-                </div>  
-                <div className='box-label'> 
-                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onChange={() => handleOutputChange('Excel')}/>
-                <label className="form-check-label" htmlFor="flexRadioDefault2">
-                  Create excel file
-                </label>
-                </div>  
-              </div>
               <div className='filler'></div>
-              <div className='upload-button-div'>
-              <div className='filler'></div>
-              <div className='checkboxes-left'>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    className = "datepicker"
-                    label="Day of collection"
-                    slotProps={{ textField: { size: 'small' } }}
-                    defaultValue={dayjs()}
-                    onChange = {(newValue : Dayjs | null) => handleDateFieldChange(0, newValue, true)}/>
-                  <TextField
-                    required
-                    className='locationpicker'
-                    id="outlined-required"
-                    label="Location of collection"
-                    helperText='*Required'
-                    size='small'
-                    color='secondary'
-                    onChange={ (newLocation) => handleLocationChange(0, newLocation.target.value, true) }
-                  />
-                </LocalizationProvider>
-              </div>
-              <div className='checkboxes-right'>
+              <div className='filler'/>
+              <div className='specify-per-stove-div'>
                 <Button size= 'medium' color = 'secondary' variant="contained" onClick={handleOpenDateDialog} className='specify-button'>
-                Specify date per stove
+                Specify per stove
                 </Button>
                 <Dialog
                   open={dateDialogOpen}
@@ -404,7 +355,26 @@ function App() {
                   </DialogActions>
                 </Dialog>
               </div>
+              
               <div className='filler'></div>
+              <div className='upload-button-div'>
+              <div className='filler'></div>
+              <div className='checkboxes-left'>
+                <div className='box-label'>
+                  <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={() => handleOutputChange('PDF')}/>
+                  <label className="form-check-label" htmlFor="flexRadioDefault1">
+                    Create PDF file
+                  </label>
+                </div>
+                <div className='box-label'> 
+                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onChange={() => handleOutputChange('Excel')}/>
+                <label className="form-check-label" htmlFor="flexRadioDefault2">
+                  Create Excel file
+                </label>
+                </div> 
+              </div>
+              <div className='checkboxes-right'/>
+              <div className='filler'/>
               </div>              
               <div className='upload-button-div'>
               <TextField
