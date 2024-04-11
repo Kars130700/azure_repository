@@ -20,6 +20,7 @@ interface Column {
   minWidth?: number;
   align?: 'right';
   format?: (value: number) => string;
+  //test
 }
 interface Data {
   name: string;
