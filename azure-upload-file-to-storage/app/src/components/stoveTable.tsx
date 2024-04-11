@@ -47,9 +47,10 @@ interface StickyHeadTableProps {
   rows : Data[];
   setRows: React.Dispatch<React.SetStateAction<Data[]>>
   handleDateFieldChange: (rowInd: number, value: Dayjs | null, allRows: boolean) => void;
+  handleLocationFieldChange: (rowInd: number, value: string | null, allRows: boolean) => void;
 }
 
-export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, setColumn, rows, setRows, handleDateFieldChange}: StickyHeadTableProps) {
+export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, setColumn, rows, setRows, handleDateFieldChange, handleLocationFieldChange}: StickyHeadTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -63,12 +64,6 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
-  };
-
-  const handleLocationFieldChange = (rowInd: number, value: string) => {
-    console.log(rows[rowInd]["location"])
-    rows[rowInd]["location"] = value;
-    setRows(rows)
   };
 
   return (
@@ -96,7 +91,7 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
               {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.location}>
+                  <TableRow hover role="checkbox" tabIndex={-1} key={index}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       
@@ -115,7 +110,7 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
                                 <TextField
                                   size="small"
                                   label={column.id.charAt(0).toUpperCase() + column.id.slice(1)}
-                                  onChange={(event) => handleLocationFieldChange(rowIndex, event.target.value)}
+                                  onChange={(event) => handleLocationFieldChange(rowIndex, event.target.value, false)}
                                 />
                               ) : column.id === "date" ? (
                                 <DatePicker

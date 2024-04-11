@@ -68,7 +68,7 @@ function App() {
   const [email, setEmail] = useState('');
   const [PDFChecked, SetPDFChecked] = useState<boolean>(false);
   const [ExcelChecked, SetExcelChecked] = useState<boolean>(false);
-  const [dateDialogOpen, SetDateDialogOpen] = useState(false);
+  const [dialogOpen, SetDialogOpen] = useState(false);
 
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
@@ -93,7 +93,7 @@ function App() {
     if (selectedFiles.length == 0){
       notifyError("Please select at least 1 file");
   }else
-      { SetDateDialogOpen(true);}
+      { SetDialogOpen(true);}
 
   };
 
@@ -110,18 +110,24 @@ function App() {
     }
   };
   
-  const handleLocationChange = (rowInd: number, value: string, allRows: boolean) => {
-    if (rows.length !== 0)
-    {if (allRows) {
-      rows.map((row) => row['location'] = value)
+  const handleLocationFieldChange = (rowInd: number, value: string | null, allRows: boolean) => {
+    if (rows.length !== 0) {
+      const oldValue = rows[rowInd]["location"];
+      if (value !== null && value !== undefined)
+      if (allRows) {
+        console.log(value);
+        rows.forEach((row) => {
+          if (row["location"] === oldValue || row["location"] === "") {
+            row["location"] = value;
+          }
+        });
+      } else {
+        rows[rowInd]["location"] = value;
+      }
     }
-    else {
-      rows[rowInd]["location"] = value
-    }
-  } 
-  }
-  const handleCloseDateDialog = () => {
-    SetDateDialogOpen(false);
+  };
+  const handleCloseDialog = () => {
+    SetDialogOpen(false);
     setRowIndex(-1);
     setColumn("");
   };
@@ -166,8 +172,8 @@ function App() {
 
   }
   const filenames = selectedFiles.map(file => file.name);
-  const locations = [""]
-  const dates = [""]
+  const locations = rows.map(row => row.location);
+  const dates = rows.map(row => row.date);
   const inputs = {
     'PDFChecked': PDFChecked,
     'ExcelChecked': ExcelChecked,
@@ -182,11 +188,11 @@ function App() {
       return false;
     }
     if (!validateInputs(inputs)) {
-      console.log(inputs)
       notifyError('Please select a time period and filetype')
       return false;
     }
     if(!EmailValidation(email)) {return false}
+    console.log(inputs)
     return true;
   }
   
@@ -314,7 +320,7 @@ function App() {
                       helperText='*Required'
                       size='small'
                       color='secondary'
-                      onChange={ (newLocation) => handleLocationChange(0, newLocation.target.value, true) }
+                      onChange={ (newLocation) => handleLocationFieldChange(0, newLocation.target.value, true) }
                     />
                 </div>
               <div className='filler'></div>
@@ -324,13 +330,13 @@ function App() {
                 Specify per stove
                 </Button>
                 <Dialog
-                  open={dateDialogOpen}
-                  onClose={handleCloseDateDialog}
+                  open={dialogOpen}
+                  onClose={handleCloseDialog}
                   PaperProps={{
                     component: 'form',
                     onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
                       event.preventDefault();
-                      handleCloseDateDialog();
+                      handleCloseDialog();
                     },
                   style: { maxWidth: '40vw',
                     width: "100%",}
@@ -347,10 +353,11 @@ function App() {
                     setColumn={setColumn} 
                     rows={rows} 
                     setRows={setRows} 
-                    handleDateFieldChange={handleDateFieldChange}/>
+                    handleDateFieldChange={handleDateFieldChange}
+                    handleLocationFieldChange = {handleLocationFieldChange}/>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={handleCloseDateDialog}>Cancel</Button>
+                    <Button onClick={handleCloseDialog}>Cancel</Button>
                     <Button type="submit">Submit</Button>
                   </DialogActions>
                 </Dialog>
@@ -379,6 +386,7 @@ function App() {
               <div className='upload-button-div'>
               <TextField
                 required
+                autoComplete='email'
                 id="outlined-required"
                 label="E-mail"
                 helperText='*Required'
