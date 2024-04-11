@@ -45,12 +45,11 @@ interface StickyHeadTableProps {
   columnIndex: string;
   setColumn: React.Dispatch<React.SetStateAction<string>>
   rows : Data[];
-  setRows: React.Dispatch<React.SetStateAction<Data[]>>
   handleDateFieldChange: (rowInd: number, value: Dayjs | null, allRows: boolean) => void;
   handleLocationFieldChange: (rowInd: number, value: string | null, allRows: boolean) => void;
 }
 
-export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, setColumn, rows, setRows, handleDateFieldChange, handleLocationFieldChange}: StickyHeadTableProps) {
+export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, setColumn, rows, handleDateFieldChange, handleLocationFieldChange}: StickyHeadTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
