@@ -16,6 +16,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import StickyHeadTable from './components/stoveTable';
+import DownloadTable from './components/downloadTable';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -39,6 +40,7 @@ interface InputData {
   ExcelChecked: boolean;
   filenames: string[];
   email: string;
+  name: string;
   // To debug, should not be Data, but string list
   locations: string[];
   dates: string[];
@@ -66,6 +68,7 @@ function App() {
   const containerName = `upload`;
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [PDFChecked, SetPDFChecked] = useState<boolean>(false);
   const [ExcelChecked, SetExcelChecked] = useState<boolean>(false);
   const [dialogOpen, SetDialogOpen] = useState(false);
@@ -154,9 +157,11 @@ function App() {
     setRows(rows)
   };
   const handleOnEmailChange = (event : ChangeEvent<HTMLInputElement>) => {
-    const email = event.target.value;
-    setEmail(email);
+    setEmail(event.target.value);
   }
+  const handleOnNameChange = (event : ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
+  };
   const EmailValidation = (email : string) => {
     // eslint-disable-next-line no-useless-escape
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -178,6 +183,7 @@ function App() {
     'PDFChecked': PDFChecked,
     'ExcelChecked': ExcelChecked,
     'email': email,
+    'name': name,
     'filenames': filenames,
     'locations': locations,
     'dates': dates,
@@ -259,7 +265,7 @@ function App() {
         });
       })
       .then(() => {
-        toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
+        toast.update(notifyUploading.current, {render: "Conversion complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Emailing Files")
         inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
         inputs.locations = rows.map(row => row.location);
@@ -396,10 +402,24 @@ function App() {
               />
               </div>
               <div className='upload-button-div'>
+              <TextField
+                required
+                autoComplete='name'
+                id="outlined-required"
+                label="Name"
+                helperText='*Required'
+                size='small'
+                color='secondary'
+                value={name}
+                onChange={ handleOnNameChange }
+              />
+              </div>
+              <div className='upload-button-div'>
                 <Button component="label" color='secondary' variant="contained" startIcon={<CloudUploadIcon />} onClick={handleFileUpload}>
                   Upload
                 </Button>
               </div>
+              <DownloadTable/>
               <ToastContainer />
           </div>
         </Box>
