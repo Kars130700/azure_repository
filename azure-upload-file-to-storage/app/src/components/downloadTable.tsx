@@ -221,7 +221,6 @@ export default function DownloadTable( { tableData }: { tableData: Data[] } ) {
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [fileUrl, setFileUrl] = React.useState('');
   const rows = tableData.map(data => createData(data.id, data.fileName, data.uploaderName, data.date, data.url));
 
   const handleRequestSort = (
@@ -285,7 +284,6 @@ export default function DownloadTable( { tableData }: { tableData: Data[] } ) {
     .then(response => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         console.log('print');
-        setFileUrl(url);
         console.log(fileUrl)
         const link = document.createElement('a');
         link.href = url;
