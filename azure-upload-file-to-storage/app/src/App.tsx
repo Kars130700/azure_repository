@@ -202,6 +202,10 @@ function App() {
     return true;
   }
   
+  const tableData = [
+    { id: 1, fileName: 'test', uploaderName: 'test test', date: '15-04-2024', url: `https://mimimotostor.blob.core.windows.net/upload/test.xlsx`  },
+  ];
+
   const fetchSasToken = (file : File) => {
     return request
       .post(
@@ -241,6 +245,29 @@ function App() {
       return blockBlobClient.uploadData(fileArrayBuffer);
     });
   };
+
+  const getURL =(sentence: string) => {
+    // Regular expression to match the URL
+    const urlRegex = /(https?:\/\/[^\s]+)/;
+    const match = sentence.match(urlRegex);
+
+    // Extract the URL if a match is found
+    const uploadedUrl = match ? match[1] : "";
+
+    console.log(uploadedUrl);
+    return uploadedUrl
+  }
+
+  const addTableData = (fileName: string, uploaderName: string, url: string) => {
+    const currentDate = new Date();
+    const day = String(currentDate.getDate()).padStart(2, '0'); // Get the day of the month (1-31) and pad with leading zero if necessary
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Get the month (0-11), add 1, and pad with leading zero if necessary
+    const year = currentDate.getFullYear(); // Get the full year (e.g., 2024)
+
+    const date = `${day}-${month}-${year}`;
+    const id = tableData.length + 1
+    tableData.push({id, fileName, uploaderName, date, url})
+  }
   const handleFileUpload = () => {
     if (!validationChecks()) {
       return;
@@ -277,9 +304,14 @@ function App() {
           },
         });
       })
-      .then(() => {
+      .then((response: AxiosResponse<string>) => {
         // All files uploaded successfully
         toast.update(notifyUploading.current, {render: "Emailed succesfully", type: "success", isLoading: false, autoClose: 5000});
+        const responseData = response.data
+        //DEBUG
+        console.log(responseData)
+        const url = getURL(responseData)
+        addTableData('test', name, url)
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
@@ -419,7 +451,7 @@ function App() {
                   Upload
                 </Button>
               </div>
-              <DownloadTable/>
+              <DownloadTable tableData={tableData} />
               <ToastContainer />
           </div>
         </Box>

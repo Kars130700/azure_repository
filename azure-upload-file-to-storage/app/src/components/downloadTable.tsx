@@ -25,6 +25,7 @@ interface Data {
   fileName: string;
   uploaderName: string;
   date: string;
+  url: string
 }
 
 function createData(
@@ -32,19 +33,16 @@ function createData(
     fileName: string,
     uploaderName: string,
     date: string,
+    url: string
 ): Data {
   return {
     id,
     fileName,
     uploaderName,
     date,
+    url,
   };
 }
-
-const rows = [
-  createData(1, 'MeteredMimiMoto15042024', 'Erik Heideman', '15-04-2024'),
-  createData(2, 'MeteredMimiMoto16042024', 'Friedrich Freitelman', '16-04-2024')
-];
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -58,6 +56,7 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 
 type Order = 'asc' | 'desc';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key,
@@ -117,14 +116,14 @@ const headCells: readonly HeadCell[] = [
 interface EnhancedTableProps {
   numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
   rowCount: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+  // used to have numSelected, rowCount,
+  const { order, orderBy, onRequestSort } =
     props;
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
@@ -216,14 +215,15 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     </Toolbar>
   );
 }
-export default function DownloadTable() {
+export default function DownloadTable( { tableData }: { tableData: Data[] } ) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('fileName');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [fileUrl, setFileUrl] = React.useState('');
-  
+  const rows = tableData.map(data => createData(data.id, data.fileName, data.uploaderName, data.date, data.url));
+
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof Data,
@@ -231,21 +231,13 @@ export default function DownloadTable() {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
+    console.log(event)
   };
 
   const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: readonly number[] = [];
-
+    console.log(event)
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
@@ -262,6 +254,7 @@ export default function DownloadTable() {
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
+    console.log(event)
     setPage(newPage);
   };
 
@@ -285,18 +278,19 @@ export default function DownloadTable() {
     [order, orderBy, page, rowsPerPage],
   );
 
-  const downloadFile = () => {
-        axios.get(`https://mimimotostor.blob.core.windows.net/upload/test.xlsx`, {
+  const downloadFile = (fileUrl: string, fileName: string) => {
+        axios.get(fileUrl, {
         responseType: 'blob',
     })
     .then(response => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         console.log('print');
         setFileUrl(url);
+        console.log(fileUrl)
         const link = document.createElement('a');
         link.href = url;
 
-        link.download = 'test.xlsx';
+        link.download = fileName + ".xlsx";
         link.click();
         link.remove();
         window.URL.revokeObjectURL(url);
@@ -320,7 +314,6 @@ export default function DownloadTable() {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
@@ -351,7 +344,7 @@ export default function DownloadTable() {
                     <TableCell align="left">{row.uploaderName}</TableCell>
                     <TableCell align="left">{row.date}</TableCell>
                     <TableCell padding="checkbox">
-                        <IconButton aria-label="download" onClick={downloadFile}>
+                        <IconButton aria-label="download" onClick={() => downloadFile(row.url, row.fileName)}>
                             <CloudDownloadIcon/>
                         </IconButton>
                     </TableCell>
