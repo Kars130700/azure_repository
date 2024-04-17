@@ -328,8 +328,7 @@ function App() {
         //DEBUG
         console.log(responseData)
         const url = getURL(responseData)
-        addTableData('test', name, url)
-        console.log(tableData)
+        addTableData(fileName, name, url)
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
