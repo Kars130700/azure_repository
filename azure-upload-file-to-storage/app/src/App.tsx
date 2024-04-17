@@ -80,12 +80,19 @@ function App() {
   const [ExcelChecked, SetExcelChecked] = useState<boolean>(false);
   const [dialogOpen, SetDialogOpen] = useState(false);
 
+  const [fileName, setFileName] = useState("")
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
   const [tableData, setTableData] = useState<TableData[]>([]);
   //const [location, setLocation] = useState("");
   // const [date, setDate] = useState(202020);
   const [rows, setRows] = useState<Data[]>([])
+
+  const currentDate = new Date();
+  const day = String(currentDate.getDate()).padStart(2, '0'); // Get the day of the month (1-31) and pad with leading zero if necessary
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Get the month (0-11), add 1, and pad with leading zero if necessary
+  const year = currentDate.getFullYear(); // Get the full year (e.g., 2024)
+  const date = `${day}-${month}-${year}`;
 
   const notifyError = (text : string) =>  {
         toast.error(text, {
@@ -263,12 +270,6 @@ function App() {
   }
 
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
-    const currentDate = new Date();
-    const day = String(currentDate.getDate()).padStart(2, '0'); // Get the day of the month (1-31) and pad with leading zero if necessary
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Get the month (0-11), add 1, and pad with leading zero if necessary
-    const year = currentDate.getFullYear(); // Get the full year (e.g., 2024)
-
-    const date = `${day}-${month}-${year}`;
     const id = tableData.length + 1
     const newTableData = [...tableData];
     // Push the new item to the copied array
@@ -283,10 +284,15 @@ function App() {
     }
     const notify = (text : string) => notifyUploading.current = toast(text, {type: "info", isLoading: true, position: "bottom-center"});
     notify("Uploading Files")
+    if (PDFChecked){
+      setFileName("MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".pdf")}
+    else
+    {
+      setFileName("MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".xlsx")}
       Promise.all(
         selectedFiles.map((file) => {
-          addTableData('test', name, "");
-          console.log(tableData)
+          console.log("we gaan aan de slag")
+          addTableData(fileName, name, "");
           return fetchSasToken(file).then(({ url }) => {
             return uploadFileWithToken(file, url);
           });
