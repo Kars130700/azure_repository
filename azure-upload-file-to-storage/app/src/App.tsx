@@ -338,10 +338,10 @@ function App() {
       });
   };
 
-  const debug = () => {
-    addTableData('test', name, "")
-    console.log(tableData)
-  }
+  // const debug = () => {
+  //   addTableData('test', name, "")
+  //   console.log(tableData)
+  // }
   return (
     <>
     <body className= 'body'>
