@@ -215,13 +215,17 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     </Toolbar>
   );
 }
-export default function DownloadTable( { tableData }: { tableData: Data[] } ) {
+export default function DownloadTable( { tableData }: { tableData: Data[] },  ) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('fileName');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const rows = tableData.map(data => createData(data.id, data.fileName, data.uploaderName, data.date, data.url));
+  const rows = React.useMemo(
+    () =>
+      tableData.map(data => createData(data.id, data.fileName, data.uploaderName, data.date, data.url)),
+    [tableData]
+  );
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,

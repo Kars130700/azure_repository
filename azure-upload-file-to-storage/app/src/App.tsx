@@ -312,6 +312,7 @@ function App() {
         console.log(responseData)
         const url = getURL(responseData)
         addTableData('test', name, url)
+        console.log(tableData)
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
@@ -325,7 +326,6 @@ function App() {
         }
       });
   };
-
   return (
     <>
     <body className= 'body'>
@@ -447,7 +447,11 @@ function App() {
               />
               </div>
               <div className='upload-button-div'>
-                <Button component="label" color='secondary' variant="contained" startIcon={<CloudUploadIcon />} onClick={handleFileUpload}>
+                <Button component="label" 
+                  color='secondary' 
+                  variant="contained" 
+                  startIcon={<CloudUploadIcon />} 
+                  onClick={handleFileUpload}>
                   Upload
                 </Button>
               </div>
