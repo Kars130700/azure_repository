@@ -51,6 +51,13 @@ interface Data {
   location: string;
   date: string;
 }
+interface TableData {
+  id: number;
+  fileName: string;
+  uploaderName: string;
+  date: string;
+  url: string
+}
 
 function createData(
   name: string,
@@ -75,6 +82,7 @@ function App() {
 
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
+  const [tableData, setTableData] = useState<TableData[]>([]);
   //const [location, setLocation] = useState("");
   // const [date, setDate] = useState(202020);
   const [rows, setRows] = useState<Data[]>([])
@@ -201,10 +209,6 @@ function App() {
     console.log(inputs)
     return true;
   }
-  
-  const tableData = [
-    { id: 1, fileName: 'test', uploaderName: 'test test', date: '15-04-2024', url: `https://mimimotostor.blob.core.windows.net/upload/test.xlsx`  },
-  ];
 
   const fetchSasToken = (file : File) => {
     return request
@@ -266,7 +270,12 @@ function App() {
 
     const date = `${day}-${month}-${year}`;
     const id = tableData.length + 1
-    tableData.push({id, fileName, uploaderName, date, url})
+    const newTableData = [...tableData];
+    // Push the new item to the copied array
+    newTableData.push({id, fileName, uploaderName, date, url});
+    // Set the new tableData array
+    console.log(newTableData)
+    setTableData(newTableData);
   }
   const handleFileUpload = () => {
     if (!validationChecks()) {
@@ -276,6 +285,8 @@ function App() {
     notify("Uploading Files")
       Promise.all(
         selectedFiles.map((file) => {
+          addTableData('test', name, "");
+          console.log(tableData)
           return fetchSasToken(file).then(({ url }) => {
             return uploadFileWithToken(file, url);
           });
@@ -326,6 +337,11 @@ function App() {
         }
       });
   };
+
+  const debug = () => {
+    addTableData('test', name, "")
+    console.log(tableData)
+  }
   return (
     <>
     <body className= 'body'>
@@ -451,7 +467,9 @@ function App() {
                   color='secondary' 
                   variant="contained" 
                   startIcon={<CloudUploadIcon />} 
-                  onClick={handleFileUpload}>
+                  onClick={handleFileUpload}
+                  //onClick={debug}
+                  >
                   Upload
                 </Button>
               </div>
