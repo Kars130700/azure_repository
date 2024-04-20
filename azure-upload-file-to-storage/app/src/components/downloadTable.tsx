@@ -222,8 +222,6 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const rows = tableData.map(data => createData(data.id, data.fileName, data.uploaderName, data.date, data.url));
-  console.log("rows:")
-  console.log(rows)
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof Data,

@@ -266,21 +266,16 @@ function App({tableDataOriginal}: Props) {
     // Extract the URL if a match is found
     const uploadedUrl = match ? match[1] : "";
 
-    console.log(uploadedUrl);
     return uploadedUrl
   }
   const updateURL = useCallback((url : string) => {
       const lastIndex = tableData.length - 1;
-      console.log("updateURL is called");
       const newTableData = [...tableData];
       
       if (lastIndex >= 0) {
-          console.log("url is:");
-          console.log(url);
           newTableData[lastIndex].url = url;
       }
       
-      console.log("new tableData is ...");
       console.log(newTableData);
       setTableData(newTableData);
   }, [tableData]); // Depend on tableData only
@@ -291,7 +286,6 @@ function App({tableDataOriginal}: Props) {
     // Push the new item to the copied array
     newTableData.push({id, fileName, uploaderName, date, url});
     // Set the new tableData array
-    console.log(newTableData)
     setTableData(newTableData);
   }
   
@@ -302,7 +296,6 @@ function App({tableDataOriginal}: Props) {
     }
     else
     {
-      console.log('Excel')
       _fileName= "MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".xlsx"
     }
     addTableData(_fileName, name, "");
@@ -356,10 +349,7 @@ function App({tableDataOriginal}: Props) {
         toast.update(notifyUploading.current, {render: "Emailed succesfully", type: "success", isLoading: false, autoClose: 5000});
         const responseData = response.data
         //DEBUG
-        console.log(responseData)
         const url = getURL(responseData)
-        console.log('URL in responseData')
-        console.log(url)
         setURL(url)
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
