@@ -1,7 +1,7 @@
 import { BlockBlobClient } from '@azure/storage-blob';
 import { Box, Button, TextField } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { ChangeEvent, useState, useRef, useEffect, useCallback } from 'react';
+import { ChangeEvent, useState, useRef, useEffect } from 'react';
 import ErrorBoundary from './components/error-boundary';
 import NavBar from './components/navbar';
 import { convertFileToArrayBuffer } from './lib/convert-file-to-arraybuffer';
@@ -268,18 +268,20 @@ function App({tableDataOriginal}: Props) {
 
     return uploadedUrl
   }
-  const updateURL = useCallback((url : string) => {
-      const lastIndex = tableData.length - 1;
-      const newTableData = [...tableData];
-      
-      if (lastIndex >= 0) {
-          newTableData[lastIndex].url = url;
-      }
-      
-      console.log("rerender");
-      setTableData(newTableData);
-  }, [tableData]); // Depend on tableData only
 
+  useEffect(() => {
+    // Update URL when downloadURL changes
+    if (downloadURL !== '') {
+        const lastIndex = tableData.length - 1;
+        const newTableData = [...tableData];
+        
+        if (lastIndex >= 0) {
+            newTableData[lastIndex].url = downloadURL;
+        }
+        
+        setTableData(newTableData);
+    }
+  }, [downloadURL, tableData])
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
     const id = tableData.length + 1
     const newTableData = [...tableData];
@@ -302,12 +304,6 @@ function App({tableDataOriginal}: Props) {
     handleFileUpload();
   }
 
-  useEffect(() => {
-      // Update URL when downloadURL changes
-      if (downloadURL !== '') {
-          updateURL(downloadURL);
-      }
-  }, [downloadURL, updateURL])
   const handleFileUpload = () => {
     
     if (!validationChecks()) {
@@ -495,7 +491,7 @@ function App({tableDataOriginal}: Props) {
                   Upload
                 </Button>
               </div>
-              <div className='upload-button-div'>
+              {/* <div className='upload-button-div'>
                   <Button component="label" 
                   color='secondary' 
                   variant="contained" 
@@ -505,7 +501,7 @@ function App({tableDataOriginal}: Props) {
                   >
                   Upload
                 </Button>
-              </div>
+              </div> */}
               <DownloadTable tableData={tableData} />
               <ToastContainer />
           </div>
