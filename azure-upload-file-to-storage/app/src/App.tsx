@@ -89,6 +89,7 @@ function App({tableDataOriginal}: Props) {
   //const [location, setLocation] = useState("");
   // const [date, setDate] = useState(202020);
   const [rows, setRows] = useState<Data[]>([])
+  const [downloadURL, setURL] = useState("");
 
   const currentDate = new Date();
   const day = String(currentDate.getDate()).padStart(2, '0'); // Get the day of the month (1-31) and pad with leading zero if necessary
@@ -307,6 +308,9 @@ function App({tableDataOriginal}: Props) {
     }
     addTableData(_fileName, name, "");
     handleFileUpload();
+    if (downloadURL !== "") {
+    updateURL(downloadURL);
+    }
   }
   const handleFileUpload = () => {
     
@@ -351,7 +355,7 @@ function App({tableDataOriginal}: Props) {
         //DEBUG
         console.log(responseData)
         const url = getURL(responseData)
-        updateURL(url)
+        setURL(url)
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
