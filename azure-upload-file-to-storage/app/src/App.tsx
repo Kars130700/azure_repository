@@ -276,6 +276,8 @@ function App({tableDataOriginal}: Props) {
     // Push the new item to the copied array
     if (lastIndex >= 0) {
       // Modify the url of the last entry
+      console.log("url is:")
+      console.log(url)
       newTableData[lastIndex].url = url;}
 
     // Set the new tableData array
@@ -490,6 +492,17 @@ function App({tableDataOriginal}: Props) {
                   variant="contained" 
                   startIcon={<CloudUploadIcon />} 
                   onClick={handleFileName}
+                  //onClick={debug}
+                  >
+                  Upload
+                </Button>
+              </div>
+              <div className='upload-button-div'>
+                  <Button component="label" 
+                  color='secondary' 
+                  variant="contained" 
+                  startIcon={<CloudUploadIcon />} 
+                  onClick={() => updateURL('test')}
                   //onClick={debug}
                   >
                   Upload
