@@ -25,9 +25,6 @@ const Accept: React.FC<AcceptProps> = ({ onFilesAccepted }) => {
         Drag & Drop or click to choose .dat files
       </p>
     );
-    if (acceptedFiles.length == 0) {
-      onFilesAccepted(acceptedFiles); 
-    }
 
   return (
     <section className="container">

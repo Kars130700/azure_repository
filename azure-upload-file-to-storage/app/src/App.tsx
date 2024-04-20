@@ -56,7 +56,7 @@ interface TableData {
   fileName: string;
   uploaderName: string;
   date: string;
-  url: string
+  url: string 
 }
 
 function createData(
@@ -70,9 +70,12 @@ function createData(
 function removeExtension(filename : string): string{
   return filename.replace(/\.[^/.]+$/, "")
 }
-
-function App() {
+interface Props{
+  tableDataOriginal: TableData[];
+}
+function App({tableDataOriginal}: Props) {
   const containerName = `upload`;
+  const [tableData, setTableData] = useState<TableData[]>(tableDataOriginal);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -80,10 +83,10 @@ function App() {
   const [ExcelChecked, SetExcelChecked] = useState<boolean>(false);
   const [dialogOpen, SetDialogOpen] = useState(false);
 
-  const [fileName, setFileName] = useState("")
+  const [fileName, setFileName] = useState('')
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
-  const [tableData, setTableData] = useState<TableData[]>([]);
+
   //const [location, setLocation] = useState("");
   // const [date, setDate] = useState(202020);
   const [rows, setRows] = useState<Data[]>([])
@@ -268,6 +271,16 @@ function App() {
     console.log(uploadedUrl);
     return uploadedUrl
   }
+  const updateURL = (url : string) => {
+    // Assuming tableData is your array of TableData objects
+    const lastIndex = tableData.length - 1;
+
+    // Ensure the array is not empty before accessing the last element
+    if (lastIndex >= 0) {
+        // Modify the url of the last entry
+        tableData[lastIndex].url = url;
+}
+  }
 
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
     const id = tableData.length + 1
@@ -278,21 +291,32 @@ function App() {
     console.log(newTableData)
     setTableData(newTableData);
   }
+  const handleFileName = () => {
+    let _fileName = ""
+    if (PDFChecked){
+      _fileName = "MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".pdf"
+      setFileName(_fileName)
+    }
+    else
+    {
+      console.log('Excel')
+      _fileName= "MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".xlsx"
+      setFileName(_fileName)
+      console.log(_fileName)
+      console.log(fileName)
+    }
+    addTableData(_fileName, name, "");
+  }
   const handleFileUpload = () => {
+    
     if (!validationChecks()) {
       return;
     }
+    handleFileName()
     const notify = (text : string) => notifyUploading.current = toast(text, {type: "info", isLoading: true, position: "bottom-center"});
     notify("Uploading Files")
-    if (PDFChecked){
-      setFileName("MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".pdf")}
-    else
-    {
-      setFileName("MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".xlsx")}
       Promise.all(
         selectedFiles.map((file) => {
-          console.log("we gaan aan de slag")
-          addTableData(fileName, name, "");
           return fetchSasToken(file).then(({ url }) => {
             return uploadFileWithToken(file, url);
           });
@@ -328,7 +352,7 @@ function App() {
         //DEBUG
         console.log(responseData)
         const url = getURL(responseData)
-        addTableData(fileName, name, url)
+        updateURL(url)
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
@@ -347,10 +371,10 @@ function App() {
   //   addTableData('test', name, "")
   //   console.log(tableData)
   // }
+  document.body.style.backgroundColor = '#F1F1F1';
   return (
     <>
-    <body className= 'body'>
-      <NavBar></NavBar>
+    <NavBar/>
     <div className='app-container'>
       <ErrorBoundary>
         <Box>
@@ -484,8 +508,7 @@ function App() {
         </Box>
       </ErrorBoundary>
     </div>
-    </body>
-   </> 
+    </>
   );
 }
 export default App;

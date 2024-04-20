@@ -342,9 +342,11 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
                     <TableCell align="left">{row.uploaderName}</TableCell>
                     <TableCell align="left">{row.date}</TableCell>
                     <TableCell padding="checkbox">
-                        <IconButton aria-label="download" onClick={() => downloadFile(row.url, row.fileName)}>
-                            <CloudDownloadIcon/>
-                        </IconButton>
+                    {row.url !== "" && (
+                      <IconButton aria-label="download" onClick={() => downloadFile(row.url, row.fileName)}>
+                          <CloudDownloadIcon/>
+                      </IconButton>
+                    )}
                     </TableCell>
                   </TableRow>
                 );
