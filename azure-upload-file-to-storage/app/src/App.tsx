@@ -281,7 +281,9 @@ function App({tableDataOriginal}: Props) {
     // Set the new tableData array
     console.log("new tableData is ...")
     console.log(newTableData)
-    setTableData(newTableData);
+    setTimeout(() => {
+      setTableData(newTableData);
+    }, 0);
 }
   }
 
