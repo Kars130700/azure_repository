@@ -1,7 +1,7 @@
 import { BlockBlobClient } from '@azure/storage-blob';
 import { Box, Button, TextField } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { ChangeEvent, useState, useRef, useEffect } from 'react';
+import { ChangeEvent, useState, useRef, useEffect, useCallback } from 'react';
 import ErrorBoundary from './components/error-boundary';
 import NavBar from './components/navbar';
 import { convertFileToArrayBuffer } from './lib/convert-file-to-arraybuffer';
@@ -269,23 +269,21 @@ function App({tableDataOriginal}: Props) {
     console.log(uploadedUrl);
     return uploadedUrl
   }
-  const updateURL = (url : string) => {
-    // Assuming tableData is your array of TableData objects
-    const lastIndex = tableData.length - 1;
-    console.log("updateURL is called")
-    const newTableData = [...tableData];
-    // Push the new item to the copied array
-    if (lastIndex >= 0) {
-      // Modify the url of the last entry
-      console.log("url is:")
-      console.log(url)
-      newTableData[lastIndex].url = url;}
-
-    // Set the new tableData array
-    console.log("new tableData is ...")
-    console.log(newTableData);
-    setTableData(newTableData);
-    }
+  const updateURL = useCallback((url : string) => {
+      const lastIndex = tableData.length - 1;
+      console.log("updateURL is called");
+      const newTableData = [...tableData];
+      
+      if (lastIndex >= 0) {
+          console.log("url is:");
+          console.log(url);
+          newTableData[lastIndex].url = url;
+      }
+      
+      console.log("new tableData is ...");
+      console.log(newTableData);
+      setTableData(newTableData);
+  }, [tableData]); // Depend on tableData only
 
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
     const id = tableData.length + 1
