@@ -276,7 +276,7 @@ function App({tableDataOriginal}: Props) {
     // Push the new item to the copied array
     if (lastIndex >= 0) {
       // Modify the url of the last entry
-      newTableData[lastIndex].url = url;
+      newTableData[lastIndex].url = url;}
 
     // Set the new tableData array
     console.log("new tableData is ...")
@@ -284,8 +284,7 @@ function App({tableDataOriginal}: Props) {
     setTimeout(() => {
       setTableData(newTableData);
     }, 0);
-}
-  }
+    }
 
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
     const id = tableData.length + 1
