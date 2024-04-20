@@ -288,7 +288,7 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
         const link = document.createElement('a');
         link.href = url;
 
-        link.download = fileName + ".xlsx";
+        link.download = fileName;
         link.click();
         link.remove();
         window.URL.revokeObjectURL(url);

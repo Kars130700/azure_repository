@@ -83,7 +83,6 @@ function App({tableDataOriginal}: Props) {
   const [ExcelChecked, SetExcelChecked] = useState<boolean>(false);
   const [dialogOpen, SetDialogOpen] = useState(false);
 
-  const [fileName, setFileName] = useState('')
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
 
@@ -136,7 +135,6 @@ function App({tableDataOriginal}: Props) {
       const oldValue = rows[rowInd]["location"];
       if (value !== null && value !== undefined)
       if (allRows) {
-        console.log(value);
         rows.forEach((row) => {
           if (row["location"] === oldValue || row["location"] === "") {
             row["location"] = value;
@@ -216,7 +214,6 @@ function App({tableDataOriginal}: Props) {
       return false;
     }
     if(!EmailValidation(email)) {return false}
-    console.log(inputs)
     return true;
   }
 
@@ -282,6 +279,7 @@ function App({tableDataOriginal}: Props) {
       newTableData[lastIndex].url = url;
 
     // Set the new tableData array
+    console.log("new tableData is ...")
     console.log(newTableData)
     setTableData(newTableData);
 }
@@ -300,15 +298,11 @@ function App({tableDataOriginal}: Props) {
     let _fileName = ""
     if (PDFChecked){
       _fileName = "MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".pdf"
-      setFileName(_fileName)
     }
     else
     {
       console.log('Excel')
       _fileName= "MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".xlsx"
-      setFileName(_fileName)
-      console.log(_fileName)
-      console.log(fileName)
     }
     addTableData(_fileName, name, "");
   }
@@ -343,7 +337,6 @@ function App({tableDataOriginal}: Props) {
         inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
         inputs.locations = rows.map(row => row.location);
         inputs.dates = rows.map(row => row.date);
-        console.log(rows);
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
             'Content-Type': 'application/json',
