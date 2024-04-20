@@ -276,7 +276,7 @@ function App({tableDataOriginal}: Props) {
           newTableData[lastIndex].url = url;
       }
       
-      console.log(newTableData);
+      console.log("rerender");
       setTableData(newTableData);
   }, [tableData]); // Depend on tableData only
 
