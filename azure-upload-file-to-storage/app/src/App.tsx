@@ -1,7 +1,7 @@
 import { BlockBlobClient } from '@azure/storage-blob';
 import { Box, Button, TextField } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { ChangeEvent, useState, useRef } from 'react';
+import { ChangeEvent, useState, useRef, useEffect } from 'react';
 import ErrorBoundary from './components/error-boundary';
 import NavBar from './components/navbar';
 import { convertFileToArrayBuffer } from './lib/convert-file-to-arraybuffer';
@@ -296,6 +296,7 @@ function App({tableDataOriginal}: Props) {
     console.log(newTableData)
     setTableData(newTableData);
   }
+  
   const handleFileName = () => {
     let _fileName = ""
     if (PDFChecked){
@@ -309,6 +310,13 @@ function App({tableDataOriginal}: Props) {
     addTableData(_fileName, name, "");
     handleFileUpload();
   }
+
+  useEffect(() => {
+      // Update URL when downloadURL changes
+      if (downloadURL !== '') {
+          updateURL(downloadURL);
+      }
+  }, [downloadURL, updateURL])
   const handleFileUpload = () => {
     
     if (!validationChecks()) {
@@ -355,11 +363,6 @@ function App({tableDataOriginal}: Props) {
         console.log('URL in responseData')
         console.log(url)
         setURL(url)
-        console.log('downloadURL in responseData')
-        console.log(downloadURL)
-        if (downloadURL !== "") {
-        updateURL(downloadURL);
-        }
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
       })
@@ -373,7 +376,6 @@ function App({tableDataOriginal}: Props) {
         }
       });
   };
-
   document.body.style.backgroundColor = '#F1F1F1';
   return (
     <>
