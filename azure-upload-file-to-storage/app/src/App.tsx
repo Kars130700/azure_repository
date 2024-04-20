@@ -274,11 +274,16 @@ function App({tableDataOriginal}: Props) {
   const updateURL = (url : string) => {
     // Assuming tableData is your array of TableData objects
     const lastIndex = tableData.length - 1;
-
-    // Ensure the array is not empty before accessing the last element
+    console.log("updateURL is called")
+    const newTableData = [...tableData];
+    // Push the new item to the copied array
     if (lastIndex >= 0) {
-        // Modify the url of the last entry
-        tableData[lastIndex].url = url;
+      // Modify the url of the last entry
+      newTableData[lastIndex].url = url;
+
+    // Set the new tableData array
+    console.log(newTableData)
+    setTableData(newTableData);
 }
   }
 
@@ -367,10 +372,6 @@ function App({tableDataOriginal}: Props) {
       });
   };
 
-  // const debug = () => {
-  //   addTableData('test', name, "")
-  //   console.log(tableData)
-  // }
   document.body.style.backgroundColor = '#F1F1F1';
   return (
     <>
