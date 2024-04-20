@@ -308,6 +308,8 @@ function App({tableDataOriginal}: Props) {
     }
     addTableData(_fileName, name, "");
     handleFileUpload();
+    console.log('downloadURL in responseData')
+    console.log(downloadURL)
     if (downloadURL !== "") {
     updateURL(downloadURL);
     }
@@ -355,6 +357,8 @@ function App({tableDataOriginal}: Props) {
         //DEBUG
         console.log(responseData)
         const url = getURL(responseData)
+        console.log('URL in responseData')
+        console.log(url)
         setURL(url)
         // Fetch the updated file list
         return request.get(`/api/list?container=${containerName}`);
