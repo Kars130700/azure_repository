@@ -280,10 +280,8 @@ function App({tableDataOriginal}: Props) {
 
     // Set the new tableData array
     console.log("new tableData is ...")
-    console.log(newTableData)
-    setTimeout(() => {
-      setTableData(newTableData);
-    }, 0);
+    console.log(newTableData);
+    setTableData(newTableData);
     }
 
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
@@ -306,13 +304,13 @@ function App({tableDataOriginal}: Props) {
       _fileName= "MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".xlsx"
     }
     addTableData(_fileName, name, "");
+    handleFileUpload();
   }
   const handleFileUpload = () => {
     
     if (!validationChecks()) {
       return;
     }
-    handleFileName()
     const notify = (text : string) => notifyUploading.current = toast(text, {type: "info", isLoading: true, position: "bottom-center"});
     notify("Uploading Files")
       Promise.all(
@@ -491,7 +489,7 @@ function App({tableDataOriginal}: Props) {
                   color='secondary' 
                   variant="contained" 
                   startIcon={<CloudUploadIcon />} 
-                  onClick={handleFileUpload}
+                  onClick={handleFileName}
                   //onClick={debug}
                   >
                   Upload
