@@ -6,6 +6,7 @@ import ErrorBoundary from './components/error-boundary';
 import NavBar from './components/navbar';
 import { convertFileToArrayBuffer } from './lib/convert-file-to-arraybuffer';
 import DragDropFile from './components/dragAndDrop';
+import signalRService from './components/signalRservice';
 import axios, { AxiosResponse } from 'axios';
 import './App.css';
 import { Id, ToastContainer, toast } from 'react-toastify';
@@ -57,6 +58,10 @@ interface TableData {
   uploaderName: string;
   date: string;
   url: string 
+}
+interface Message {
+  user: string;
+  message: string;
 }
 
 function createData(
@@ -362,6 +367,32 @@ function App({tableDataOriginal}: Props) {
         }
       });
   };
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [user, setUser] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+
+  useEffect(() => {
+    signalRService.startConnection('https://cmmtrigger3.azurewebsites.net/api/SignalRFunction?');
+
+    signalRService.onReceiveMessage((receivedUser: string, receivedMessage: string) => {
+      setMessages((prevMessages) => [...prevMessages, { user: receivedUser, message: receivedMessage }]);
+    });
+
+    return () => {
+      signalRService.connection?.stop().catch(error => console.error('Error stopping SignalR connection:', error));
+    };
+  }, []); // Make sure to remove `messages` from the dependency array to prevent infinite re-renders
+
+  const debug = () => {
+    setUser ("Kars");
+    setMessage("sjongejonge zeg");
+    console.log(messages)
+    sendMessage()
+  }
+  const sendMessage = () => {
+    signalRService.sendMessage(user, message);
+    setMessage('');
+  };
   document.body.style.backgroundColor = '#F1F1F1';
   return (
     <>
@@ -493,17 +524,17 @@ function App({tableDataOriginal}: Props) {
                   Upload
                 </Button>
               </div>
-              {/* <div className='upload-button-div'>
-                  <Button component="label" 
-                  color='secondary' 
-                  variant="contained" 
-                  startIcon={<CloudUploadIcon />} 
-                  onClick={() => updateURL('test')}
-                  //onClick={debug}
-                  >
-                  Upload
+              <div className='upload-button-div'>
+                <Button component="label" 
+                color='secondary' 
+                variant="contained" 
+                startIcon={<CloudUploadIcon />} 
+                onClick={debug}
+                //onClick={debug}
+                >
+                Upload
                 </Button>
-              </div> */}
+              </div> 
               <DownloadTable tableData={tableData} />
               <ToastContainer />
           </div>
