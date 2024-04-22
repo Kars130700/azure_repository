@@ -6,7 +6,7 @@ import ErrorBoundary from './components/error-boundary';
 import NavBar from './components/navbar';
 import { convertFileToArrayBuffer } from './lib/convert-file-to-arraybuffer';
 import DragDropFile from './components/dragAndDrop';
-import signalRService from './components/signalRservice';
+//import signalRService from './components/signalRservice';
 import axios, { AxiosResponse } from 'axios';
 import './App.css';
 import { Id, ToastContainer, toast } from 'react-toastify';
@@ -59,10 +59,16 @@ interface TableData {
   date: string;
   url: string 
 }
-interface Message {
-  user: string;
-  message: string;
+interface UserData {
+  username: string;
+  password: string;
+  tableData: TableData[];
+  login: boolean;
 }
+// interface Message {
+//   user: string;
+//   message: string;
+// }
 
 function createData(
   name: string,
@@ -76,9 +82,12 @@ function removeExtension(filename : string): string{
   return filename.replace(/\.[^/.]+$/, "")
 }
 interface Props{
+  username: string;
+  //debug: should password be here?
+  password: string;
   tableDataOriginal: TableData[];
 }
-function App({tableDataOriginal}: Props) {
+function App({username, password, tableDataOriginal}: Props) {
   const containerName = `upload`;
   const [tableData, setTableData] = useState<TableData[]>(tableDataOriginal);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -273,8 +282,31 @@ function App({tableDataOriginal}: Props) {
 
     return uploadedUrl
   }
-
   useEffect(() => {
+    const updateTableDataInDataBase = async (): Promise<void> => {
+        const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
+
+        const jsonPayload: UserData = {
+            username: username,
+            password: password,
+            tableData: tableData,
+            login: false,
+        };
+
+        try {
+            const response: AxiosResponse = await axios.post(url, jsonPayload);
+            console.log('Response:', response.data);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                // Axios error
+                console.error('Axios error:', error.message);
+            } else {
+                // Non-Axios error
+                console.error('Error:', error);
+            }
+        }
+    };
+
     // Update URL when downloadURL changes
     if (downloadURL !== '') {
         const lastIndex = tableData.length - 1;
@@ -285,10 +317,13 @@ function App({tableDataOriginal}: Props) {
         }
         
         setTableData(newTableData);
-        setURL("")
+        updateTableDataInDataBase().catch((error) => {
+            console.error('Unhandled promise rejection:', error);
+        });
+        setURL("");
     }
-    console.log('rerender')
-  }, [downloadURL, tableData])
+    console.log('rerender');
+}, [downloadURL, tableData, username, password]);
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
     const id = tableData.length + 1
     const newTableData = [...tableData];
@@ -367,32 +402,32 @@ function App({tableDataOriginal}: Props) {
         }
       });
   };
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [user, setUser] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
+  // const [messages, setMessages] = useState<Message[]>([]);
+  // const [user, setUser] = useState<string>('');
+  // const [message, setMessage] = useState<string>('');
 
-  useEffect(() => {
-    signalRService.startConnection('https://cmmtrigger3.azurewebsites.net/api/SignalRFunction?');
+  // useEffect(() => {
+  //   signalRService.startConnection('https://cmmtrigger3.azurewebsites.net/api/SignalRFunction?');
 
-    signalRService.onReceiveMessage((receivedUser: string, receivedMessage: string) => {
-      setMessages((prevMessages) => [...prevMessages, { user: receivedUser, message: receivedMessage }]);
-    });
+  //   signalRService.onReceiveMessage((receivedUser: string, receivedMessage: string) => {
+  //     setMessages((prevMessages) => [...prevMessages, { user: receivedUser, message: receivedMessage }]);
+  //   });
 
-    return () => {
-      signalRService.connection?.stop().catch(error => console.error('Error stopping SignalR connection:', error));
-    };
-  }, []); // Make sure to remove `messages` from the dependency array to prevent infinite re-renders
+  //   return () => {
+  //     signalRService.connection?.stop().catch(error => console.error('Error stopping SignalR connection:', error));
+  //   };
+  // }, []); // Make sure to remove `messages` from the dependency array to prevent infinite re-renders
 
-  const debug = () => {
-    setUser ("Kars");
-    setMessage("sjongejonge zeg");
-    console.log(messages)
-    sendMessage()
-  }
-  const sendMessage = () => {
-    signalRService.sendMessage(user, message);
-    setMessage('');
-  };
+  // const debug = () => {
+  //   setUser ("Kars");
+  //   setMessage("sjongejonge zeg");
+  //   console.log(messages)
+  //   sendMessage()
+  // }
+  // const sendMessage = () => {
+  //   signalRService.sendMessage(user, message);
+  //   setMessage('');
+  // };
   document.body.style.backgroundColor = '#F1F1F1';
   return (
     <>
@@ -524,7 +559,7 @@ function App({tableDataOriginal}: Props) {
                   Upload
                 </Button>
               </div>
-              <div className='upload-button-div'>
+              {/*<div className='upload-button-div'>
                 <Button component="label" 
                 color='secondary' 
                 variant="contained" 
@@ -534,7 +569,7 @@ function App({tableDataOriginal}: Props) {
                 >
                 Upload
                 </Button>
-              </div> 
+                </div>*/} 
               <DownloadTable tableData={tableData} />
               <ToastContainer />
           </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@mui/material';
+import axios, { AxiosResponse } from 'axios';
 import App from './App'; // Import the component you want to navigate to
 
 //Maybe use Router stuff to fix this problem and increase scalability
@@ -11,29 +12,53 @@ interface TableData {
     url: string
   }
 
+interface UserData {
+    username: string;
+    password: string;
+    tableData: TableData[];
+    login: boolean;
+}
+
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
   const [tableData, setTableData] = useState<TableData[]>([]);
 
+  async function checkLogin(): Promise<void> {
+    const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
+
+    const jsonPayload: UserData = {
+        username: username,
+        password: password,
+        tableData: [
+        ],
+        login: true,
+    };
+
+    try {
+        const response: AxiosResponse = await axios.post(url, jsonPayload);
+        console.log('Response:', response.data);
+        setIsLoggedIn(true)
+        setTableData(response.data as TableData[]);
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            // Axios error
+            console.error('Axios error:', error.message);
+        } else {
+            // Non-Axios error
+            console.error('Error:', error);
+        }
+    }
+}
   const onLogin = (username: string, password: string) => {
     console.log(username);
     console.log(password);
     console.log("CheckingPW...");
 
     // Check if login is successful (replace this with your actual login logic)
-    const isLoginSuccessful = true; // For example
-    if (isLoginSuccessful) {
-      setIsLoggedIn(true); // Set isLoggedIn to true upon successful login
-    }
-    const fakeTableData: TableData[] = [ 
-        {id: 1,
-        fileName: "example.txt",
-        uploaderName: "John Doe",
-        date: "2024-04-20",
-        url: "https://example.com/example.txt"}];
-      setTableData(fakeTableData);
+    checkLogin().catch((error) => {
+      console.error('Unhandled promise rejection:', error)});
   };
 
   const handleByPass = () => {
@@ -101,7 +126,7 @@ function LoginPage() {
   );}
   else {
     return(
-      <App tableDataOriginal={tableData} />// Render App component if logged in
+      <App username={username} password= {password} tableDataOriginal={tableData} />// Render App component if logged in
   )}
 }
 
