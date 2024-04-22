@@ -323,7 +323,8 @@ function App({username, password, tableDataOriginal}: Props) {
         setURL("");
     }
     console.log('rerender');
-}, [downloadURL, tableData, username, password]);
+  }, [downloadURL, tableData, username, password]);
+
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
     const id = tableData.length + 1
     const newTableData = [...tableData];
