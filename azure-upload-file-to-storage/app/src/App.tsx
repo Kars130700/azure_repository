@@ -364,7 +364,7 @@ function App({username, password, tableDataOriginal}: Props) {
       
       .then(() => {
         toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
-        notify("Converting files")
+        notify("Converting files from .DAT to .TXT")
         return request.post('https://cmmtrigger3.azurewebsites.net/api/HttpTrigger1?', inputs, {
           headers: {
             'Content-Type': 'application/json',
@@ -373,7 +373,7 @@ function App({username, password, tableDataOriginal}: Props) {
       })
       .then(() => {
         toast.update(notifyUploading.current, {render: "Conversion complete", type: "success", isLoading: false, autoClose: 5000})
-        notify("Emailing Files")
+        notify("Making Excel or PDF document")
         inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
         inputs.locations = rows.map(row => row.location);
         inputs.dates = rows.map(row => row.date);
@@ -385,7 +385,7 @@ function App({username, password, tableDataOriginal}: Props) {
       })
       .then((response: AxiosResponse<string>) => {
         // All files uploaded successfully
-        toast.update(notifyUploading.current, {render: "Emailed succesfully", type: "success", isLoading: false, autoClose: 5000});
+        toast.update(notifyUploading.current, {render: "Documents ready", type: "success", isLoading: false, autoClose: 5000});
         const responseData = response.data
         //DEBUG
         const url = getURL(responseData)

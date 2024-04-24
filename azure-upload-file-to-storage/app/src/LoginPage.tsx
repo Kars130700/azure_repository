@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@mui/material';
 import axios, { AxiosResponse } from 'axios';
 import App from './App'; // Import the component you want to navigate to
+import {  ToastContainer, toast } from 'react-toastify';
 
 //Maybe use Router stuff to fix this problem and increase scalability
 interface TableData {
@@ -18,7 +19,11 @@ interface UserData {
     tableData: TableData[];
     login: boolean;
 }
-
+const notifyError = (text : string) =>  {
+  toast.error(text, {
+  position: "bottom-center"
+})
+};
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -44,10 +49,10 @@ function LoginPage() {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             // Axios error
-            console.error('Axios error:', error.message);
+            notifyError("Login unsuccesful, please try again");
         } else {
             // Non-Axios error
-            console.error('Error:', error);
+            notifyError("Login unsuccesful, please try again");
         }
     }
 }
@@ -122,6 +127,7 @@ function LoginPage() {
             </Button>
           </div>
         </div>
+        <ToastContainer/>
       </div>
   );}
   else {
