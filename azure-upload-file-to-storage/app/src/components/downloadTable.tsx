@@ -129,7 +129,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
-
+  
   return (
     <TableHead>
       <TableRow>
@@ -164,11 +164,16 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
+  handleDelete: () => void;
 }
 
-function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
-
+function EnhancedTableToolbar(props: EnhancedTableToolbarProps ) {
+  const { numSelected, handleDelete } = props;
+  
+  const handleDeleteSelected = () => {
+    // Pass selected rows to the parent component for deletion
+    handleDelete();
+  };
   return (
     <Toolbar
       sx={{
@@ -201,7 +206,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       )}
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton aria-label="delete" onClick={() => handleDeleteSelected()}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -221,7 +226,13 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const rows = tableData.map(data => createData(data.id, data.fileName, data.uploaderName, data.date, data.url));
+  const [rows, setRows] = React.useState<Data[]>([]); // State variable for rows
+
+  // Update rows when tableData changes
+  React.useEffect(() => {
+    setRows(tableData.map(data => createData(data.id, data.fileName, data.uploaderName, data.date, data.url)));
+  }, [tableData]);
+
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof Data,
@@ -251,6 +262,12 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
     setSelected(newSelected);
   };
 
+  const handleDelete = () => {
+    const updatedRows = rows.filter(row => !selected.includes(row.id));
+    setSelected([]);
+    setRows(updatedRows);
+  };
+  
   const handleChangePage = (event: unknown, newPage: number) => {
     console.log(event)
     setPage(newPage);
@@ -299,7 +316,7 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
   return (
     <Box sx={{ width: '80%', margin: '0 auto' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} handleDelete={handleDelete} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
