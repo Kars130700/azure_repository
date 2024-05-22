@@ -381,7 +381,13 @@ function App({username, password, tableDataOriginal}: Props) {
         notify("Converting files from .DAT to .TXT")
         inputs.dates = rows.map(row => row.date);
         console.log(inputs)
-        return request.post('https://cmmtrigger3.azurewebsites.net/api/HttpTrigger1?', inputs, {
+        // return request.post('https://cmmtrigger3.azurewebsites.net/api/HttpTrigger1?', inputs, {
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        // });
+        //DEBUG debug
+        return request.post('http://localhost:7110/api/HttpTrigger1', inputs, {
           headers: {
             'Content-Type': 'application/json',
           },
