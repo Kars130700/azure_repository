@@ -210,7 +210,7 @@ function App({username, password, tableDataOriginal}: Props) {
   const filenames = selectedFiles.map(file => file.name);
   const locations = rows.map(row => row.location);
   const dates = rows.map(row => row.date);
-  const lastModifiedDates: number[] = []
+  const lastModifiedDates: string[] = []
   addLastModifiedDates(selectedFiles, lastModifiedDates)
 
   const inputs = {
@@ -224,13 +224,13 @@ function App({username, password, tableDataOriginal}: Props) {
     'lastModifiedDates': lastModifiedDates
   }
 
-  function addLastModifiedDates(selectedFiles: File[], lastModifiedDates: number[]) {
+  function addLastModifiedDates(selectedFiles: File[], lastModifiedDates: string[]) {
     // Clear the lastModifiedDates array to ensure it's empty before adding new dates
     lastModifiedDates.length = 0;
   
     // Iterate through the selectedFiles array and push the lastModified dates to lastModifiedDates
     selectedFiles.forEach(file => {
-      lastModifiedDates.push(file.lastModified);
+      lastModifiedDates.push(new Date(file.lastModified).toLocaleString());
     });
   }
   const validationChecks = () => {
