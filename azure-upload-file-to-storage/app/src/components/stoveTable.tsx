@@ -116,6 +116,7 @@ export default function StickyHeadTable( {rowIndex, setRowIndex, columnIndex, se
                                 <DatePicker
                                   label="Controlled picker"
                                   slotProps={{ textField: { size: 'small' } }}
+                                  format="DD/MM/YYYY"
                                   onChange={(newValue: Dayjs | null) => handleDateFieldChange(rowIndex, newValue, false)}
                                 />
                               ) : (

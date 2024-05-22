@@ -136,10 +136,10 @@ function App({username, password, tableDataOriginal}: Props) {
     if (rows.length !== 0)
     { if (value !== null && value !== undefined)
     { if (allRows){
-      rows.map((row) => row["date"] = value.format('MM/DD/YYYY'))
+      rows.map((row) => row["date"] = value.format('DD/MM/YYYY'))
       }
       else {
-        rows[rowInd]["date"] = value.format('MM/DD/YYYY')
+        rows[rowInd]["date"] = value.format('DD/MM/YYYY')
       }
     }
     }
@@ -184,7 +184,7 @@ function App({username, password, tableDataOriginal}: Props) {
   const handleFilesAccepted = (files : File[]) => {
     setSelectedFiles(files);
     rows.length = 0
-    files.forEach((file) => {rows.push(createData(removeExtension(file.name), "", dayjs('2022-04-17').format('DD/MM/YYYY')))})
+    files.forEach((file) => {rows.push(createData(removeExtension(file.name), "", dayjs().format('DD/MM/YYYY')))})
     setRows(rows)
   };
   const handleOnEmailChange = (event : ChangeEvent<HTMLInputElement>) => {
@@ -464,6 +464,7 @@ function App({username, password, tableDataOriginal}: Props) {
                       label="Day of collection"
                       slotProps={{ textField: { size: 'small' } }}
                       defaultValue={dayjs()}
+                      format="DD/MM/YYYY"
                       onChange = {(newValue : Dayjs | null) => handleDateFieldChange(0, newValue, true)}/>
                   </LocalizationProvider>
                 </div>
