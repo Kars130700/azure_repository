@@ -361,10 +361,12 @@ function App({username, password, tableDataOriginal}: Props) {
           });
         })
       )
-      
+      //First, we convert the .DAT files to .TXT files, using the MM_Decoder
       .then(() => {
         toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Converting files from .DAT to .TXT")
+        inputs.dates = rows.map(row => row.date);
+        console.log(inputs)
         return request.post('https://cmmtrigger3.azurewebsites.net/api/HttpTrigger1?', inputs, {
           headers: {
             'Content-Type': 'application/json',
@@ -376,7 +378,6 @@ function App({username, password, tableDataOriginal}: Props) {
         notify("Making Excel or PDF document")
         inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
         inputs.locations = rows.map(row => row.location);
-        inputs.dates = rows.map(row => row.date);
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
             'Content-Type': 'application/json',
