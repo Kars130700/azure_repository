@@ -100,8 +100,6 @@ function App({username, password, tableDataOriginal}: Props) {
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
 
-  //const [location, setLocation] = useState("");
-  // const [date, setDate] = useState(202020);
   const [rows, setRows] = useState<Data[]>([])
   const [downloadURL, setURL] = useState("");
 
@@ -116,11 +114,6 @@ function App({username, password, tableDataOriginal}: Props) {
         position: "bottom-center"
       })
     };
-  // const notifyUpload = (text : string) =>  {
-  //     toast.success(text, {
-  //     position: "bottom-center"
-  //   })
-  // };
   
   const notifyUploading = useRef<Id>("");
   
@@ -299,7 +292,7 @@ function App({username, password, tableDataOriginal}: Props) {
   useEffect(() => {
     const updateTableDataInDataBase = async (): Promise<void> => {
         const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
-
+        //we set login to false, so we can change the database and not only read it.
         const jsonPayload: UserData = {
             username: username,
             password: password,
@@ -347,7 +340,7 @@ function App({username, password, tableDataOriginal}: Props) {
     // Set the new tableData array
     setTableData(newTableData);
   }
-  
+
   const handleFileName = () => {
     let _fileName = ""
     if (PDFChecked){
@@ -587,7 +580,7 @@ function App({username, password, tableDataOriginal}: Props) {
                 Upload
                 </Button>
                 </div>*/} 
-              <DownloadTable tableData={tableData} />
+              <DownloadTable tableData={tableData} setTableData={setTableData} />
               <ToastContainer />
           </div>
         </Box>

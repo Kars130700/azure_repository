@@ -40,27 +40,17 @@ function LoginPage() {
         ],
         login: true,
     };
-
+    //We try to login to with the provided username an PW. If this works, the tableData is updated accordingly
     try {
         const response: AxiosResponse = await axios.post(url, jsonPayload);
         console.log('Response:', response.data);
         setIsLoggedIn(true)
         setTableData(response.data as TableData[]);
     } catch (error) {
-        if (axios.isAxiosError(error)) {
-            // Axios error
-            notifyError("Login unsuccesful, please try again");
-        } else {
-            // Non-Axios error
-            notifyError("Login unsuccesful, please try again");
-        }
-    }
+      notifyError("Login unsuccessful, please try again");
+  }
 }
-  const onLogin = (username: string, password: string) => {
-    console.log(username);
-    console.log(password);
-    console.log("CheckingPW...");
-
+  const onLogin = () => {
     // Check if login is successful (replace this with your actual login logic)
     checkLogin().catch((error) => {
       console.error('Unhandled promise rejection:', error)});
@@ -111,7 +101,7 @@ function LoginPage() {
               component="label"
               color='secondary'
               variant="contained"
-              onClick={() => onLogin(username, password)}
+              onClick={() => onLogin()}
             >
               Login
             </Button>

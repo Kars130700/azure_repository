@@ -1,4 +1,5 @@
-import * as React from 'react';
+// DownloadTable.tsx
+import React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -20,20 +21,20 @@ import IconButton from '@mui/material/IconButton';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import axios from 'axios';
 
-interface Data {
+export interface Data {
   id: number;
   fileName: string;
   uploaderName: string;
   date: string;
-  url: string
+  url: string;
 }
 
 function createData(
-    id: number,
-    fileName: string,
-    uploaderName: string,
-    date: string,
-    url: string
+  id: number,
+  fileName: string,
+  uploaderName: string,
+  date: string,
+  url: string
 ): Data {
   return {
     id,
@@ -69,10 +70,6 @@ function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   stabilizedThis.sort((a, b) => {
@@ -122,9 +119,7 @@ interface EnhancedTableProps {
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  // used to have numSelected, rowCount,
-  const { order, orderBy, onRequestSort } =
-    props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
@@ -167,13 +162,13 @@ interface EnhancedTableToolbarProps {
   handleDelete: () => void;
 }
 
-function EnhancedTableToolbar(props: EnhancedTableToolbarProps ) {
+function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   const { numSelected, handleDelete } = props;
   
   const handleDeleteSelected = () => {
-    // Pass selected rows to the parent component for deletion
     handleDelete();
   };
+
   return (
     <Toolbar
       sx={{
@@ -220,17 +215,22 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps ) {
     </Toolbar>
   );
 }
-export default function DownloadTable( { tableData }: { tableData: Data[] },  ) {
+
+interface DownloadTableProps {
+  tableData: Data[];
+  setTableData: React.Dispatch<React.SetStateAction<Data[]>>;
+}
+
+export default function DownloadTable({ tableData, setTableData }: DownloadTableProps) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('fileName');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [rows, setRows] = React.useState<Data[]>([]); // State variable for rows
+  const [rows, setRows] = React.useState<Data[]>(tableData);
 
-  // Update rows when tableData changes
   React.useEffect(() => {
-    setRows(tableData.map(data => createData(data.id, data.fileName, data.uploaderName, data.date, data.url)));
+    setRows(tableData);
   }, [tableData]);
 
   const handleRequestSort = (
@@ -240,13 +240,11 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-    console.log(event)
   };
 
   const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: readonly number[] = [];
-    console.log(event)
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
@@ -265,11 +263,18 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
   const handleDelete = () => {
     const updatedRows = rows.filter(row => !selected.includes(row.id));
     setSelected([]);
-    setRows(updatedRows);
+    setTableData(updatedRows);
   };
   
+  const addRow = (fileName: string, uploaderName: string, url: string, date: string) => {
+    const id = tableData.length + 1
+    const newRows = [...rows];
+    // Push the new item to the copied array
+    newRows.push({id, fileName, uploaderName, date, url});
+    // Set the new tableData array
+    setRows(newRows);
+}
   const handleChangePage = (event: unknown, newPage: number) => {
-    console.log(event)
     setPage(newPage);
   };
 
@@ -280,9 +285,7 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
 
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const visibleRows = React.useMemo(
     () =>
@@ -294,35 +297,29 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
   );
 
   const downloadFile = (fileUrl: string, fileName: string) => {
-        axios.get(fileUrl, {
-        responseType: 'blob',
+    axios.get(fileUrl, {
+      responseType: 'blob',
     })
     .then(response => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        console.log(fileUrl)
-        const link = document.createElement('a');
-        link.href = url;
-
-        link.download = fileName;
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url);
-        })
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    })
     .catch(error => {
-        console.error('Error downloading file:', error);
+      console.error('Error downloading file:', error);
     });
-    };
+  };
 
   return (
     <Box sx={{ width: '80%', margin: '0 auto' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar numSelected={selected.length} handleDelete={handleDelete} />
         <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={'small'}
-          >
+          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'small'}>
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
@@ -331,7 +328,7 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
               rowCount={rows.length}
             />
             <TableBody>
-              {visibleRows.map((row : Data, index) => {
+              {visibleRows.map((row: Data, index) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -346,32 +343,23 @@ export default function DownloadTable( { tableData }: { tableData: Data[] },  ) 
                     selected={isItemSelected}
                     sx={{ cursor: 'pointer' }}
                   >
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="normal"
-                    >
+                    <TableCell component="th" id={labelId} scope="row" padding="normal">
                       {row.fileName}
                     </TableCell>
                     <TableCell align="left">{row.uploaderName}</TableCell>
                     <TableCell align="left">{row.date}</TableCell>
                     <TableCell padding="checkbox">
-                    {row.url !== "" && (
-                      <IconButton aria-label="download" onClick={() => downloadFile(row.url, row.fileName)}>
-                          <CloudDownloadIcon/>
-                      </IconButton>
-                    )}
+                      {row.url && (
+                        <IconButton aria-label="download" onClick={() => downloadFile(row.url, row.fileName)}>
+                          <CloudDownloadIcon />
+                        </IconButton>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
               })}
               {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (33) * emptyRows,
-                  }}
-                >
+                <TableRow style={{ height: 33 * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
