@@ -337,7 +337,8 @@ function App({ username, password, tableDataOriginal }: Props) {
       .then(() => {
         toast.update(notifyUploading.current, {render: "Conversion complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Making Excel or PDF document")
-        //inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
+        inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
+        console.log(inputs)
         inputs.locations = rows.map(row => row.location);
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
