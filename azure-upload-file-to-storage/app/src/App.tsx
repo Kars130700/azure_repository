@@ -87,272 +87,226 @@ interface Props{
   password: string;
   tableDataOriginal: TableData[];
 }
-function App({username, password, tableDataOriginal}: Props) {
-  const containerName = `upload`;
+function App({ username, password, tableDataOriginal }: Props) {
+  const containerName = 'upload';
   const [tableData, setTableData] = useState<TableData[]>(tableDataOriginal);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [PDFChecked, SetPDFChecked] = useState<boolean>(false);
-  const [ExcelChecked, SetExcelChecked] = useState<boolean>(false);
-  const [dialogOpen, SetDialogOpen] = useState(false);
-
+  const [PDFChecked, setPDFChecked] = useState<boolean>(false);
+  const [ExcelChecked, setExcelChecked] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [rowIndex, setRowIndex] = useState(-1);
   const [columnIndex, setColumn] = useState("");
-
-  const [rows, setRows] = useState<Data[]>([])
+  const [rows, setRows] = useState<Data[]>([]);
   const [downloadURL, setURL] = useState("");
 
   const currentDate = new Date();
-  const day = String(currentDate.getDate()).padStart(2, '0'); // Get the day of the month (1-31) and pad with leading zero if necessary
-  const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Get the month (0-11), add 1, and pad with leading zero if necessary
-  const year = currentDate.getFullYear(); // Get the full year (e.g., 2024)
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const year = currentDate.getFullYear();
   const date = `${day}-${month}-${year}`;
 
-  const notifyError = (text : string) =>  {
-        toast.error(text, {
-        position: "bottom-center"
-      })
-    };
-  
-  const notifyUploading = useRef<Id>("");
-  
-  const handleOpenDateDialog = () => { 
-    if (selectedFiles.length == 0){
-      notifyError("Please select at least 1 file");
-  }else
-      { SetDialogOpen(true);}
+  const notifyError = (text: string) => {
+    toast.error(text, {
+      position: "bottom-center"
+    });
+  };
 
+  const notifyUploading = useRef<Id>("");
+
+  const handleOpenDateDialog = () => {
+    if (selectedFiles.length === 0) {
+      notifyError("Please select at least 1 file");
+    } else {
+      setDialogOpen(true);
+    }
   };
 
   const handleDateFieldChange = (rowInd: number, value: Dayjs | null, allRows: boolean) => {
-    if (rows.length !== 0)
-    { if (value !== null && value !== undefined)
-    { if (allRows){
-      rows.map((row) => row["date"] = value.format('DD/MM/YYYY'))
-      }
-      else {
-        rows[rowInd]["date"] = value.format('DD/MM/YYYY')
-      }
-    }
-    }
-  };
-  
-  const handleLocationFieldChange = (rowInd: number, value: string | null, allRows: boolean) => {
-    if (rows.length !== 0) {
-      const oldValue = rows[rowInd]["location"];
-      if (value !== null && value !== undefined)
+    if (rows.length !== 0 && value !== null) {
       if (allRows) {
-        rows.forEach((row) => {
-          if (row["location"] === oldValue || row["location"] === "") {
-            row["location"] = value;
-          }
-        });
+        setRows(rows.map((row) => ({ ...row, date: value.format('DD/MM/YYYY') })));
       } else {
-        rows[rowInd]["location"] = value;
+        const updatedRows = [...rows];
+        updatedRows[rowInd].date = value.format('DD/MM/YYYY');
+        setRows(updatedRows);
       }
     }
   };
+
+  const handleLocationFieldChange = (rowInd: number, value: string | null, allRows: boolean) => {
+    if (rows.length !== 0 && value !== null) {
+      const oldValue = rows[rowInd].location;
+      if (allRows) {
+        setRows(rows.map((row) => ({
+          ...row,
+          location: row.location === oldValue || row.location === "" ? value : row.location
+        })));
+      } else {
+        const updatedRows = [...rows];
+        updatedRows[rowInd].location = value;
+        setRows(updatedRows);
+      }
+    }
+  };
+
   const handleCloseDialog = () => {
-    SetDialogOpen(false);
+    setDialogOpen(false);
     setRowIndex(-1);
     setColumn("");
   };
-  
-  const handleOutputChange = (input : string) => {
-    if (input === 'PDF') {
-      SetPDFChecked(true);
-      SetExcelChecked(false);
-    } else if (input === 'Excel') {
-      SetPDFChecked(false);
-      SetExcelChecked(true);
-    }
+
+  const handleOutputChange = (input: string) => {
+    setPDFChecked(input === 'PDF');
+    setExcelChecked(input === 'Excel');
   };
 
-  const validateInputs = (data: InputData) => {
-    return data.PDFChecked || data.ExcelChecked;
-  };
+  const validateInputs = (data: InputData) => data.PDFChecked || data.ExcelChecked;
 
-  //debug, would be better if the array became empty after the user selected the files (not on pressing the upload box)
-  const handleFilesAccepted = (files : File[]) => {
+  const handleFilesAccepted = (files: File[]) => {
     setSelectedFiles(files);
-    rows.length = 0
-    files.forEach((file) => {rows.push(createData(removeExtension(file.name), "", dayjs().format('DD/MM/YYYY')))})
-    setRows(rows)
+    const newRows = files.map((file) => createData(removeExtension(file.name), "", dayjs().format('DD/MM/YYYY')));
+    setRows(newRows);
   };
-  const handleOnEmailChange = (event : ChangeEvent<HTMLInputElement>) => {
+
+  const handleOnEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
-  }
-  const handleOnNameChange = (event : ChangeEvent<HTMLInputElement>) => {
+  };
+
+  const handleOnNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
-  const EmailValidation = (email : string) => {
+
+  const emailValidation = (email: string) => {
     // eslint-disable-next-line no-useless-escape
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-    if ( re.test(email) ) {
-        setEmail(email);
-        return true;
-    }
-    else {
-      notifyError('Please provide a valid email address')
+    if (re.test(email)) {
+      setEmail(email);
+      return true;
+    } else {
+      notifyError('Please provide a valid email address');
       return false;
     }
+  };
 
-  }
   const filenames = selectedFiles.map(file => file.name);
   const locations = rows.map(row => row.location);
   const dates = rows.map(row => row.date);
-  const lastModifiedDates: string[] = []
-  addLastModifiedDates(selectedFiles, lastModifiedDates)
+  const lastModifiedDates: string[] = [];
+  addLastModifiedDates(selectedFiles, lastModifiedDates);
 
   const inputs = {
-    'PDFChecked': PDFChecked,
-    'ExcelChecked': ExcelChecked,
-    'email': email,
-    'name': name,
-    'filenames': filenames,
-    'locations': locations,
-    'dates': dates,
-    'lastModifiedDates': lastModifiedDates
-  }
+    PDFChecked,
+    ExcelChecked,
+    email,
+    name,
+    filenames,
+    locations,
+    dates,
+    lastModifiedDates
+  };
 
   function addLastModifiedDates(selectedFiles: File[], lastModifiedDates: string[]) {
-    // Clear the lastModifiedDates array to ensure it's empty before adding new dates
     lastModifiedDates.length = 0;
-  
-    // Iterate through the selectedFiles array and push the lastModified dates to lastModifiedDates
     selectedFiles.forEach(file => {
       lastModifiedDates.push(new Date(file.lastModified).toLocaleString());
     });
   }
+
   const validationChecks = () => {
-    if (selectedFiles.length == 0) {
+    if (selectedFiles.length === 0) {
       notifyError('No files are selected');
       return false;
     }
     if (!validateInputs(inputs)) {
-      notifyError('Please select a time period and filetype')
+      notifyError('Please select a time period and filetype');
       return false;
     }
-    if(!EmailValidation(email)) {return false}
+    if (!emailValidation(email)) return false;
     return true;
-  }
+  };
 
-  const fetchSasToken = (file : File) => {
-    return request
-      .post(
+  const fetchSasToken = async (file: File) => {
+    try {
+      const result = await axios.post<SasResponse>(
         `/api/sas?file=${encodeURIComponent(file.name)}&permission=w&container=${containerName}&timerange=5`,
         {
           headers: {
             'Content-Type': 'application/json',
           },
         }
-      )
-      .then((result: AxiosResponse<SasResponse>)  => {
-        const { data } = result;
-        return { url: data.url };
-      })
-      .catch((error) => {
-        if (error instanceof Error) {
-          const { message, stack } = error;
-          toast.update(notifyUploading.current, {render: (`Failed to finish upload with error: ${message} ${stack || ''}`), type: "error", isLoading: false, autoClose: 5000});
-          throw error
-        } else {
-          toast.update(notifyUploading.current, {render: error as string, type: "error", isLoading: false, autoClose: 5000});
-          throw error
-        }
-      });
-  };
-  
-  const uploadFileWithToken = (file : File, url : string) => {
-    return convertFileToArrayBuffer(file).then((fileArrayBuffer) => {
-      if (
-        fileArrayBuffer === null ||
-        fileArrayBuffer.byteLength < 1 ||
-        fileArrayBuffer.byteLength > 256000
-      ) {
-        return;
-      }
-      const blockBlobClient = new BlockBlobClient(url);
-      return blockBlobClient.uploadData(fileArrayBuffer);
-    });
+      );
+      return { url: result.data.url };
+    } catch (error) {
+      notifyError("SAS code not generated");
+      throw error;
+    }
   };
 
-  const getURL =(sentence: string) => {
-    // Regular expression to match the URL
+  const uploadFileWithToken = async (file: File, url: string) => {
+    const fileArrayBuffer = await convertFileToArrayBuffer(file);
+    if (fileArrayBuffer && fileArrayBuffer.byteLength > 0 && fileArrayBuffer.byteLength <= 256000) {
+      const blockBlobClient = new BlockBlobClient(url);
+      await blockBlobClient.uploadData(fileArrayBuffer);
+    }
+  };
+
+  const getURL = (sentence: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/;
     const match = sentence.match(urlRegex);
+    return match ? match[1] : "";
+  };
 
-    // Extract the URL if a match is found
-    const uploadedUrl = match ? match[1] : "";
-
-    return uploadedUrl
-  }
   useEffect(() => {
-    const updateTableDataInDataBase = async (): Promise<void> => {
-        const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
-        //we set login to false, so we can change the database and not only read it.
-        const jsonPayload: UserData = {
-            username: username,
-            password: password,
-            tableData: tableData,
-            login: false,
-        };
+    const updateTableDataInDataBase = async () => {
+      const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
+      const jsonPayload: UserData = {
+        username,
+        password,
+        tableData,
+        login: false,
+      };
 
-        try {
-            const response: AxiosResponse = await axios.post(url, jsonPayload);
-            console.log('Response:', response.data);
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                // Axios error
-                console.error('Axios error:', error.message);
-            } else {
-                // Non-Axios error
-                console.error('Error:', error);
-            }
-        }
+      try {
+        const response = await axios.post(url, jsonPayload);
+        console.log('Response:', response.data);
+      } catch (error) {
+        notifyError("Table not saved correctly");
+      }
     };
 
-    // Update URL when downloadURL changes
     if (downloadURL !== '') {
-        const lastIndex = tableData.length - 1;
+      const lastIndex = tableData.length - 1;
+      if (lastIndex >= 0) {
         const newTableData = [...tableData];
-        
-        if (lastIndex >= 0) {
-            newTableData[lastIndex].url = downloadURL;
-        }
-        
+        newTableData[lastIndex].url = downloadURL;
         setTableData(newTableData);
         updateTableDataInDataBase().catch((error) => {
-            console.error('Unhandled promise rejection:', error);
-        });
+          console.error('Unhandled promise rejection:', error);
+      });
         setURL("");
+      }
     }
     console.log('rerender');
   }, [downloadURL, tableData, username, password]);
 
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
-    const id = tableData.length + 1
-    const newTableData = [...tableData];
-    // Push the new item to the copied array
-    newTableData.push({id, fileName, uploaderName, date, url});
-    // Set the new tableData array
+    const id = tableData.length + 1;
+    const newTableData = [...tableData, { id, fileName, uploaderName, date, url }];
     setTableData(newTableData);
-  }
+  };
 
   const handleFileName = () => {
-    let _fileName = ""
-    if (PDFChecked){
-      _fileName = "MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".pdf"
-    }
-    else
-    {
-      _fileName= "MM"+ name.replace(new RegExp("\\s", "g"), "")+ date+".xlsx"
+    let _fileName = "";
+    if (PDFChecked) {
+      _fileName = "MM" + name.replace(/\s/g, "") + date + ".pdf";
+    } else {
+      _fileName = "MM" + name.replace(/\s/g, "") + date + ".xlsx";
     }
     addTableData(_fileName, name, "");
     handleFileUpload();
-  }
+  };
 
   const handleFileUpload = () => {
     
@@ -569,17 +523,6 @@ function App({username, password, tableDataOriginal}: Props) {
                   Upload
                 </Button>
               </div>
-              {/*<div className='upload-button-div'>
-                <Button component="label" 
-                color='secondary' 
-                variant="contained" 
-                startIcon={<CloudUploadIcon />} 
-                onClick={debug}
-                //onClick={debug}
-                >
-                Upload
-                </Button>
-                </div>*/} 
               <DownloadTable tableData={tableData} setTableData={setTableData} />
               <ToastContainer />
           </div>
