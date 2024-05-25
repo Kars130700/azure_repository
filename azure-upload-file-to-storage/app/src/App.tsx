@@ -227,10 +227,12 @@ function App({ username, password, tableDataOriginal }: Props) {
     return true;
   };
 
-  const fetchSasToken = async (file: File) => {
+  const fetchSasToken = async (file: File, folderName: string) => {
     try {
+      //DEBUG TODO foldername moet gecheckt wordne
+      const fileName = encodeURIComponent(`${folderName}/${file.name}`);
       const result = await axios.post<SasResponse>(
-        `/api/sas?file=${encodeURIComponent(file.name)}&permission=w&container=${containerName}&timerange=5`,
+        `/api/sas?file=${encodeURIComponent(fileName)}&permission=w&container=${containerName}&timerange=5`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -317,7 +319,7 @@ function App({ username, password, tableDataOriginal }: Props) {
     notify("Uploading Files")
       Promise.all(
         selectedFiles.map((file) => {
-          return fetchSasToken(file).then(({ url }) => {
+          return fetchSasToken(file, name).then(({ url }) => {
             return uploadFileWithToken(file, url);
           });
         })
