@@ -231,7 +231,7 @@ function App({ username, password, tableDataOriginal }: Props) {
     try {
       //DEBUG TODO foldername moet gecheckt wordne
       const fileName = encodeURIComponent(`${folderName}/${file.name}`);
-      inputs['filenames'] = inputs['filenames'].map(filename => `${folderName}/${filename}`);
+      //inputs['filenames'] = inputs['filenames'].map(filename => `${folderName}/${filename}`);
       const result = await axios.post<SasResponse>(
         `/api/sas?file=${fileName}&permission=w&container=${containerName}&timerange=5`,
         {
