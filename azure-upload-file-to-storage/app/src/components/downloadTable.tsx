@@ -234,7 +234,7 @@ export default function DownloadTable({ tableData, setTableData }: DownloadTable
   }, [tableData]);
 
   const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
+    _event: React.MouseEvent<unknown>,
     property: keyof Data,
   ) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -242,7 +242,7 @@ export default function DownloadTable({ tableData, setTableData }: DownloadTable
     setOrderBy(property);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const handleClick = (_event: React.MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: readonly number[] = [];
     if (selectedIndex === -1) {
@@ -266,15 +266,12 @@ export default function DownloadTable({ tableData, setTableData }: DownloadTable
     setTableData(updatedRows);
   };
   
-  const addRow = (fileName: string, uploaderName: string, url: string, date: string) => {
-    const id = tableData.length + 1
-    const newRows = [...rows];
-    // Push the new item to the copied array
-    newRows.push({id, fileName, uploaderName, date, url});
-    // Set the new tableData array
-    setRows(newRows);
-}
-  const handleChangePage = (event: unknown, newPage: number) => {
+  // Update rows when tableData changes
+  React.useEffect(() => {
+    setRows(tableData.map(data => createData(data.id, data.fileName, data.uploaderName, data.date, data.url)));
+  }, [tableData]);
+  
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
