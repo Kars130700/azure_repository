@@ -261,36 +261,41 @@ function App({ username, password, tableDataOriginal }: Props) {
 
   useEffect(() => {
     const updateTableDataInDataBase = async () => {
-      const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
-      const jsonPayload: UserData = {
-        username,
-        password,
-        tableData,
-        login: false,
-      };
+        const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
+        const jsonPayload: UserData = {
+            username,
+            password,
+            tableData,
+            login: false,
+        };
 
-      try {
-        const response = await axios.post(url, jsonPayload);
-        console.log('Response:', response.data);
-      } catch (error) {
-        notifyError("Table not saved correctly");
-      }
+        try {
+            const response = await axios.post(url, jsonPayload);
+            console.log('Response:', response.data);
+        } catch (error) {
+            console.error('Error during POST request:', error);
+            notifyError("Table not saved correctly");
+        }
     };
 
     if (downloadURL !== '') {
-      const lastIndex = tableData.length - 1;
-      if (lastIndex >= 0) {
-        const newTableData = [...tableData];
-        newTableData[lastIndex].url = downloadURL;
-        setTableData(newTableData);
-        updateTableDataInDataBase().catch((error) => {
-          console.error('Unhandled promise rejection:', error);
-      });
-        setURL("");
-      }
+        const lastIndex = tableData.length - 1;
+        console.log('Download URL is not empty, last index:', lastIndex);
+        if (lastIndex >= 0) {
+            const newTableData = [...tableData];
+            newTableData[lastIndex].url = downloadURL;
+            setTableData(newTableData);
+            console.log('Updated table data:', newTableData);
+
+            updateTableDataInDataBase().catch((error) => {
+                console.error('Unhandled promise rejection:', error);
+            });
+
+            setURL(""); // Assuming setURL is the correct function to reset downloadURL
+        }
     }
     console.log('rerender');
-  }, [downloadURL, tableData, username, password]);
+}, [downloadURL, tableData, username, password]);
 
   const addTableData = (fileName: string, uploaderName: string, url: string) => {
     const id = tableData.length + 1;
