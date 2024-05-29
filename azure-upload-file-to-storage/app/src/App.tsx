@@ -204,7 +204,8 @@ function App({ username, password, tableDataOriginal }: Props) {
     filenames,
     locations,
     dates,
-    lastModifiedDates
+    lastModifiedDates,
+    username
   };
 
   function addLastModifiedDates(selectedFiles: File[], lastModifiedDates: string[]) {
