@@ -262,6 +262,7 @@ function App({ username, password, tableDataOriginal }: Props) {
   useEffect(() => {
     const updateTableDataInDataBase = async () => {
         const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
+        console.log("URL is made")
         const jsonPayload: UserData = {
             username,
             password,
@@ -270,6 +271,7 @@ function App({ username, password, tableDataOriginal }: Props) {
         };
 
         try {
+            console.log("we're going to post")
             const response = await axios.post(url, jsonPayload);
             console.log('Response:', response.data);
         } catch (error) {
