@@ -29,7 +29,7 @@ const AdminOnly = () => {
     }
     const handleClick = () => {
         handleAdminProcessing(selectedFiles).catch((error) => {
-            console.error('Unhandled promise rejection:', error);
+            console.error('Unhandled promise rejection: ', error);
         });
     }
 
