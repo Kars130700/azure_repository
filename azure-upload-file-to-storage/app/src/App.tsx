@@ -259,7 +259,7 @@ function App({ username, password, tableDataOriginal }: Props) {
     return match ? match[1] : "";
   };
 
-  useEffect(() => {
+  useEffect(() => { 
     const updateTableDataInDataBase = async () => {
         const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
         console.log("URL is made")
@@ -279,7 +279,9 @@ function App({ username, password, tableDataOriginal }: Props) {
             notifyError("Table not saved correctly");
         }
     };
-
+    updateTableDataInDataBase().catch((error) => {
+      console.error('Unhandled promise rejection:', error);
+    });
     if (downloadURL !== '') {
         const lastIndex = tableData.length - 1;
         console.log('Download URL is not empty, last index:', lastIndex);
