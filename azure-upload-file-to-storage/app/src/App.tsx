@@ -22,6 +22,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
+import AdminOnly from './components/adminOnly'
 
 // Used only htmlFor local development
 const API_SERVER = import.meta.env.VITE_API_SERVER as string;
@@ -279,9 +280,7 @@ function App({ username, password, tableDataOriginal }: Props) {
             notifyError("Table not saved correctly");
         }
     };
-    updateTableDataInDataBase().catch((error) => {
-      console.error('Unhandled promise rejection:', error);
-    });
+    
     if (downloadURL !== '') {
         const lastIndex = tableData.length - 1;
         console.log('Download URL is not empty, last index:', lastIndex);
@@ -297,6 +296,13 @@ function App({ username, password, tableDataOriginal }: Props) {
 
             setURL(""); // Assuming setURL is the correct function to reset downloadURL
         }
+    }
+    else {
+      if (username != "") {
+      updateTableDataInDataBase().catch((error) => {
+        console.error('Unhandled promise rejection:', error);
+      });
+    }
     }
     console.log('rerender');
 }, [downloadURL, tableData, username, password]);
@@ -540,6 +546,9 @@ function App({ username, password, tableDataOriginal }: Props) {
         </Box>
       </ErrorBoundary>
     </div>
+    {username === 'admin' && (
+        <AdminOnly />
+      )}
     </>
   );
 }
