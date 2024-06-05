@@ -87,8 +87,9 @@ interface Props{
   //debug: should password be here?
   password: string;
   tableDataOriginal: TableData[];
+  guestAccess: boolean;
 }
-function App({ username, password, tableDataOriginal }: Props) {
+function App({ username, password, tableDataOriginal, guestAccess }: Props) {
   const containerName = 'upload';
   const [tableData, setTableData] = useState<TableData[]>(tableDataOriginal);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -546,7 +547,7 @@ function App({ username, password, tableDataOriginal }: Props) {
         </Box>
       </ErrorBoundary>
     </div>
-    {username === 'admin' && (
+    {username === 'admin' && !guestAccess && (
         <AdminOnly />
       )}
     </>

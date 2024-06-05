@@ -28,6 +28,7 @@ function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
+  const [guestAccess, setGuestAccess] = useState(false); 
   const [tableData, setTableData] = useState<TableData[]>([]);
 
   async function checkLogin(): Promise<void> {
@@ -58,6 +59,7 @@ function LoginPage() {
 
   const handleByPass = () => {
     setIsLoggedIn(true)
+    setGuestAccess(true)
   };
   // Conditional rendering: Render LoginPage if not logged in, otherwise render App
   if (!isLoggedIn){ 
@@ -122,7 +124,7 @@ function LoginPage() {
   );}
   else {
     return(
-      <App username={username} password= {password} tableDataOriginal={tableData} />// Render App component if logged in
+      <App username={username} password= {password} tableDataOriginal={tableData} guestAccess = {guestAccess} />// Render App component if logged in
   )}
 }
 
