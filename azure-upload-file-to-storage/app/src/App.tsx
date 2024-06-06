@@ -89,6 +89,8 @@ interface Props{
   tableDataOriginal: TableData[];
   guestAccess: boolean;
 }
+
+//debug: op het moment van droppen van files moet de locatie van die files gelijk gesteld worden aan de huidige locatie van de dinge
 function App({ username, password, tableDataOriginal, guestAccess }: Props) {
   const containerName = 'upload';
   const [tableData, setTableData] = useState<TableData[]>(tableDataOriginal);
@@ -102,6 +104,7 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
   const [columnIndex, setColumn] = useState("");
   const [rows, setRows] = useState<Data[]>([]);
   const [downloadURL, setURL] = useState("");
+  const [locationPicker, setLocationPicker] = useState("");
 
   const currentDate = new Date();
   const day = String(currentDate.getDate()).padStart(2, '0');
@@ -139,12 +142,15 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
 
   const handleLocationFieldChange = (rowInd: number, value: string | null, allRows: boolean) => {
     if (rows.length !== 0 && value !== null) {
+      setLocationPicker(value);
       const oldValue = rows[rowInd].location;
       if (allRows) {
+        console.log("all rows before:", rows)
         setRows(rows.map((row) => ({
           ...row,
           location: row.location === oldValue || row.location === "" ? value : row.location
         })));
+        console.log("all rows after:", rows)
       } else {
         const updatedRows = [...rows];
         updatedRows[rowInd].location = value;
@@ -168,6 +174,7 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
 
   const handleFilesAccepted = (files: File[]) => {
     setSelectedFiles(files);
+    handleLocationFieldChange(0, locationPicker, true)
     const newRows = files.map((file) => createData(removeExtension(file.name), "", dayjs().format('DD/MM/YYYY')));
     setRows(newRows);
   };
@@ -343,6 +350,7 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
         toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Converting files from .DAT to .TXT")
         inputs.dates = rows.map(row => row.date);
+        inputs.locations = rows.map(row => row.location);
         console.log(inputs)
         return request.post('https://cmmtrigger3.azurewebsites.net/api/HttpTrigger1?', inputs, {
           headers: {
@@ -355,7 +363,6 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
         notify("Making Excel or PDF document")
         inputs['filenames'] = inputs['filenames'].map(filename => filename.replace('.DAT', '.TXT'));
         console.log(inputs)
-        inputs.locations = rows.map(row => row.location);
         return request.post('https://mimimotofunction.azurewebsites.net/api/http_trigger', inputs, {
           headers: {
             'Content-Type': 'application/json',
