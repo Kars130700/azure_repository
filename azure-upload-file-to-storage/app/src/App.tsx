@@ -104,7 +104,6 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
   const [columnIndex, setColumn] = useState("");
   const [rows, setRows] = useState<Data[]>([]);
   const [downloadURL, setURL] = useState("");
-  const [locationPicker, setLocationPicker] = useState("");
 
   const currentDate = new Date();
   const day = String(currentDate.getDate()).padStart(2, '0');
@@ -142,8 +141,8 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
 
   const handleLocationFieldChange = (rowInd: number, value: string | null, allRows: boolean) => {
     if (rows.length !== 0 && value !== null) {
-      setLocationPicker(value);
       const oldValue = rows[rowInd].location;
+      //debug: what does allRows do?
       if (allRows) {
         console.log("all rows before:", rows)
         setRows(rows.map((row) => ({
@@ -174,7 +173,6 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
 
   const handleFilesAccepted = (files: File[]) => {
     setSelectedFiles(files);
-    handleLocationFieldChange(0, locationPicker, true)
     const newRows = files.map((file) => createData(removeExtension(file.name), "", dayjs().format('DD/MM/YYYY')));
     setRows(newRows);
   };
@@ -263,7 +261,6 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
   };
 
   const getURL = (sentence: string) => {
-    console.log("succes url is:", sentence);
     const urlRegex = /(https?:\/\/[^\s]+)/;
     const match = sentence.match(urlRegex);
     return match ? match[1] : "";
@@ -280,7 +277,6 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
         };
 
         try {
-            console.log("we're going to post")
             const response = await axios.post(url, jsonPayload);
             console.log('Response:', response.data);
         } catch (error) {
@@ -332,7 +328,9 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
   };
 
   const handleFileUpload = () => {
-    
+    inputs.dates = rows.map(row => row.date);
+    inputs.locations = rows.map(row => row.location);
+    console.log("rows:", rows);
     if (!validationChecks()) {
       return;
     }
@@ -349,8 +347,6 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
       .then(() => {
         toast.update(notifyUploading.current, {render: "Uploading complete", type: "success", isLoading: false, autoClose: 5000})
         notify("Converting files from .DAT to .TXT")
-        inputs.dates = rows.map(row => row.date);
-        inputs.locations = rows.map(row => row.location);
         console.log(inputs)
         return request.post('https://cmmtrigger3.azurewebsites.net/api/HttpTrigger1?', inputs, {
           headers: {
