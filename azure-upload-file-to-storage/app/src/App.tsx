@@ -256,6 +256,7 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
   };
 
   const getURL = (sentence: string) => {
+    console.log("succes url is:", sentence);
     const urlRegex = /(https?:\/\/[^\s]+)/;
     const match = sentence.match(urlRegex);
     return match ? match[1] : "";
@@ -264,7 +265,6 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
   useEffect(() => { 
     const updateTableDataInDataBase = async () => {
         const url = 'https://cmmtrigger3.azurewebsites.net/api/LoginFunction?';
-        console.log("URL is made")
         const jsonPayload: UserData = {
             username,
             password,
@@ -284,7 +284,6 @@ function App({ username, password, tableDataOriginal, guestAccess }: Props) {
     
     if (downloadURL !== '') {
         const lastIndex = tableData.length - 1;
-        console.log('Download URL is not empty, last index:', lastIndex);
         if (lastIndex >= 0) {
             const newTableData = [...tableData];
             newTableData[lastIndex].url = downloadURL;
